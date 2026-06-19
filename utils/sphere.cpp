@@ -1,12 +1,11 @@
 #include "utils/sphere.h"
 #include <cmath>
 #include <iostream>
-#include <vector>
 
 namespace utils {
 void Sphere::genVertices(float *vboIdx, int *eboIdx) {
 
-  for (auto i = 0; i <= slices; i++) {
+  for (auto i = 0; i < slices; i++) {
     float theta = 2.0 * M_PI * float(i % slices) / (float)slices;
     float costheta = cos(theta);
     float sintheta = sin(theta);
@@ -33,15 +32,15 @@ void Sphere::genVertices(float *vboIdx, int *eboIdx) {
 
   for (int i = 0; i < slices; i++) {
     *(eboIdx++) = getVertexNumber(i, 0);
-    *(eboIdx++) = getVertexNumber(i + 1, 1);
     *(eboIdx++) = getVertexNumber(i, 1);
+    *(eboIdx++) = getVertexNumber(i + 1, 1);
   }
 
   for (int i = 0; i < slices; i++) {
     for (int j = 1; j < stacks - 1; j++) {
       *(eboIdx++) = getVertexNumber(i, j);
-      *(eboIdx++) = getVertexNumber(i + 1, j);
       *(eboIdx++) = getVertexNumber(i, j + 1);
+      *(eboIdx++) = getVertexNumber(i + 1, j);
 
       *(eboIdx++) = getVertexNumber(i, j + 1);
       *(eboIdx++) = getVertexNumber(i + 1, j + 1);

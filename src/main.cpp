@@ -29,9 +29,9 @@ void setupGeometry() {
   glGenBuffers(1, &EBO);
   glBindVertexArray(VAO);
 
-  float vertices[240];
-  int indices[240];
-  utils::Sphere sphere = utils::Sphere();
+  float vertices[276];
+  int indices[540];
+  utils::Sphere sphere = utils::Sphere(10, 10);
   sphere.genVertices(vertices, indices);
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -51,7 +51,7 @@ int main(void) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-  window = glfwCreateWindow(900, 600, "pendulum-sim", NULL, NULL);
+  window = glfwCreateWindow(900, 900, "pendulum-sim", NULL, NULL);
   if (window == nullptr) {
     std::cout << "Failed to open glfw window\n";
     glfwTerminate();
@@ -63,7 +63,7 @@ int main(void) {
     std::cout << "Failed to initialize glad\n";
   }
 
-  glViewport(0, 0, 900, 600);
+  glViewport(0, 0, 900, 900);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
@@ -83,7 +83,7 @@ int main(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLE_STRIP, 180, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 540, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
