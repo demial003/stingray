@@ -9,6 +9,7 @@ public:
   Vec3 position;
   Vec3 velocity;
   Vec3 acceleration;
+  Vec3 forceAccum;
 
   /* rough approx of drag to mititage inaccuracies that can cause strange
    * acceleration
@@ -20,6 +21,8 @@ public:
   real getMass() const { return 1 / inverseMass; }
   real getInverseMass() const { return inverseMass; }
   void integrate(real duration);
+  void clearAccumulator();
+  void addForce(const Vec3 &force);
 
 protected:
   real inverseMass;

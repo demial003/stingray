@@ -14,4 +14,10 @@ void Particle::integrate(real duration) {
   velocity.addScaledVec3(resultingAccel, duration);
 
   velocity *= pow(damping, duration);
+
+  clearAccumulator();
 }
+
+void Particle::clearAccumulator() { forceAccum.clear(); }
+
+void Particle::addForce(const Vec3 &force) { forceAccum += force; }

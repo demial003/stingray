@@ -1,7 +1,9 @@
 #ifndef CORE_H
 #define CORE_H
 
+#include <cmath>
 #include <stingray/precision.h>
+
 namespace stingray {
 class Vec3 {
 public:
@@ -87,6 +89,8 @@ public:
       *this *= (1.0f / l);
     }
   }
+
+  void clear() { x = y = z = 0.0f; }
 
 private:
   real pad;

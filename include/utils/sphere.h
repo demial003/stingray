@@ -10,11 +10,12 @@ public:
     stacks = val2;
   }
 
-  void genVertices();
+  void genVertices(float *vboIdx, float *eboIdx);
 
 private:
   int slices;
   int stacks;
+  int getVertexNumber(int i, int j);
 };
 } // namespace utils
 #endif
