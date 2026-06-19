@@ -10,7 +10,7 @@ public:
     stacks = val2;
   }
 
-  void genVertices(float *vboIdx, float *eboIdx);
+  void genVertices(float *vboIdx, int *eboIdx);
 
 private:
   int slices;

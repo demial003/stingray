@@ -8,6 +8,7 @@
 
 unsigned int VAO;
 unsigned int VBO;
+unsigned int EBO;
 unsigned int vertPosLoc = 0;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -25,14 +26,20 @@ void processInput(GLFWwindow *window) {
 void setupGeometry() {
   glGenBuffers(1, &VBO);
   glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &EBO);
   glBindVertexArray(VAO);
 
-  float vertices[96];
+  float vertices[240];
+  int indices[240];
   utils::Sphere sphere = utils::Sphere();
-  sphere.genVertices(vertices);
+  sphere.genVertices(vertices, indices);
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+               GL_STATIC_DRAW);
   glVertexAttribPointer(vertPosLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
                         (void *)0);
   glEnableVertexAttribArray(vertPosLoc);
@@ -58,6 +65,10 @@ int main(void) {
 
   glViewport(0, 0, 900, 600);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);
+  // glCullFace(GL_BACK);
+  //  glEnable(GL_CULL_FACE);
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -72,7 +83,7 @@ int main(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 180);
+    glDrawElements(GL_TRIANGLE_STRIP, 180, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

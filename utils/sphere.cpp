@@ -4,14 +4,14 @@
 #include <vector>
 
 namespace utils {
-void Sphere::genVertices(float *vboIdx, float eboIdx) {
+void Sphere::genVertices(float *vboIdx, int *eboIdx) {
 
   for (auto i = 0; i <= slices; i++) {
     float theta = 2.0 * M_PI * float(i % slices) / (float)slices;
     float costheta = cos(theta);
     float sintheta = sin(theta);
     for (auto j = 0; j <= stacks; j++) {
-      float phi = M_PI * float(j) / (float)slices;
+      float phi = M_PI * float(j) / (float)stacks;
       float sinphi = (j < stacks) ? sin(phi) : 0.0f;
       float cosphi = cos(phi);
       float x = sinphi * sintheta;
@@ -19,6 +19,8 @@ void Sphere::genVertices(float *vboIdx, float eboIdx) {
       float z = sinphi * costheta;
 
       int vertNumber = getVertexNumber(i, j);
+      //      if (vertNumber == 1 || vertNumber == 0)
+      //        continue;
 
       float *basePtr = vboIdx + vertNumber * 3;
       *(basePtr) = x;
@@ -31,13 +33,25 @@ void Sphere::genVertices(float *vboIdx, float eboIdx) {
     }
   }
 
-  //   for (auto i = 0; i < slices; i++) {
-  //     unsigned int leftIdxOld = getVertexNumber(i, 0);
-  //     unsigned int rightIdxOld = getVertexNumber(i + 1, 1);
-  // 		for(auto j = 0; j < stacks - 1; j++){
-  // 			unsigned int leftIdxNew =
-  //
-  // 		}
+  for (auto i = 0; i < slices; i++) {
+    unsigned int leftIdxOld = getVertexNumber(i, 0);
+    unsigned int rightIdxOld = getVertexNumber(i + 1, 1);
+    for (auto j = 0; j < stacks - 1; j++) {
+      unsigned int leftIdxNew = getVertexNumber(i, j + 1);
+      unsigned int rightIdxNew = getVertexNumber(i + 1, j + 2);
+
+      *(eboIdx++) = leftIdxOld;
+      *(eboIdx++) = rightIdxOld;
+      *(eboIdx++) = leftIdxNew;
+
+      *(eboIdx++) = leftIdxNew;
+      *(eboIdx++) = rightIdxNew;
+      *(eboIdx++) = rightIdxOld;
+
+      leftIdxOld = leftIdxNew;
+      rightIdxOld = rightIdxNew;
+    }
+  }
 }
 
 int Sphere::getVertexNumber(int i, int j) {
