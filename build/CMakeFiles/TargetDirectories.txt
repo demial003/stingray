@@ -1,0 +1,4 @@
+/Users/demialao/projects/stingray/build/CMakeFiles/stingray.dir
+/Users/demialao/projects/stingray/build/CMakeFiles/copy-compile-commands.dir
+/Users/demialao/projects/stingray/build/CMakeFiles/edit_cache.dir
+/Users/demialao/projects/stingray/build/CMakeFiles/rebuild_cache.dir

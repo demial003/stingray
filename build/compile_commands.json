@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/Users/demialao/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/stingray.dir/src/main.cpp.o -c /Users/demialao/projects/stingray/src/main.cpp",
+  "file": "/Users/demialao/projects/stingray/src/main.cpp",
+  "output": "CMakeFiles/stingray.dir/src/main.cpp.o"
+},
+{
+  "directory": "/Users/demialao/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/stingray.dir/utils/sphere.cpp.o -c /Users/demialao/projects/stingray/utils/sphere.cpp",
+  "file": "/Users/demialao/projects/stingray/utils/sphere.cpp",
+  "output": "CMakeFiles/stingray.dir/utils/sphere.cpp.o"
+},
+{
+  "directory": "/Users/demialao/projects/stingray/build",
+  "command": "/usr/bin/cc  -I/Users/demialao/projects/stingray/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include  -arch arm64 -o CMakeFiles/stingray.dir/utils/glad.c.o -c /Users/demialao/projects/stingray/utils/glad.c",
+  "file": "/Users/demialao/projects/stingray/utils/glad.c",
+  "output": "CMakeFiles/stingray.dir/utils/glad.c.o"
+}
+]
