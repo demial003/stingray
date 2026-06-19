@@ -48,6 +48,12 @@ void Sphere::genVertices(float *vboIdx, int *eboIdx) {
       *(eboIdx++) = getVertexNumber(i + 1, j);
     }
   }
+
+  for (int i = 0; i < slices; i++) {
+    *(eboIdx++) = getVertexNumber(i, stacks);
+    *(eboIdx++) = getVertexNumber(i + 1, stacks - 1);
+    *(eboIdx++) = getVertexNumber(i, stacks - 1);
+  }
 }
 
 int Sphere::getVertexNumber(int i, int j) {

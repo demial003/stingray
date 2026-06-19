@@ -67,8 +67,8 @@ int main(void) {
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
-  // glCullFace(GL_BACK);
-  //  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glEnable(GL_CULL_FACE);
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
