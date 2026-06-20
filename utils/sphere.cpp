@@ -18,15 +18,11 @@ void Sphere::genVertices(float *vboIdx, int *eboIdx) {
       float z = sinphi * costheta;
 
       int vertNumber = getVertexNumber(i, j);
-      //      if (vertNumber == 1 || vertNumber == 0)
-      //        continue;
 
       float *basePtr = vboIdx + vertNumber * 3;
       *(basePtr) = x;
       *(basePtr + 1) = y;
       *(basePtr + 2) = z;
-
-      std::cout << vertNumber << ": " << x << ", " << y << ", " << z << "\n";
     }
   }
 
@@ -64,4 +60,7 @@ int Sphere::getVertexNumber(int i, int j) {
     return (stacks - 1) * (i % slices) + j + 1;
   }
 }
+
+int Sphere::vboSize() { return 3 * (slices * (stacks - 1) + 2); }
+int Sphere::eboSize() { return 6 * slices * (stacks - 1); }
 } // namespace utils

@@ -11,6 +11,8 @@ public:
   }
 
   void genVertices(float *vboIdx, int *eboIdx);
+  int vboSize();
+  int eboSize();
 
 private:
   int slices;

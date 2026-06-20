@@ -10,6 +10,8 @@ unsigned int VAO;
 unsigned int VBO;
 unsigned int EBO;
 unsigned int vertPosLoc = 0;
+unsigned int vertsSize;
+unsigned int idxSize;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   if (!glfwWindowShouldClose(window)) {
@@ -29,9 +31,11 @@ void setupGeometry() {
   glGenBuffers(1, &EBO);
   glBindVertexArray(VAO);
 
-  float vertices[276];
-  int indices[540];
-  utils::Sphere sphere = utils::Sphere(10, 10);
+  utils::Sphere sphere = utils::Sphere(40, 40);
+  vertsSize = sphere.vboSize();
+  idxSize = sphere.eboSize();
+  float vertices[vertsSize];
+  int indices[idxSize];
   sphere.genVertices(vertices, indices);
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -83,7 +87,7 @@ int main(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 540, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, idxSize, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
