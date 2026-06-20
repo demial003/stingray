@@ -31,7 +31,7 @@ void setupGeometry() {
   glGenBuffers(1, &EBO);
   glBindVertexArray(VAO);
 
-  utils::Sphere sphere = utils::Sphere(40, 40);
+  utils::Sphere sphere = utils::Sphere(80, 80);
   vertsSize = sphere.vboSize();
   idxSize = sphere.eboSize();
   float vertices[vertsSize];
