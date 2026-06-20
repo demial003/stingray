@@ -1,1 +1,0 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/stingray.dir/link.d CMakeFiles/stingray.dir/src/main.cpp.o CMakeFiles/stingray.dir/utils/sphere.cpp.o CMakeFiles/stingray.dir/utils/glad.c.o -o stingray  /usr/lib/libGL.so /usr/lib/libglfw.so.3.4 -ldl
