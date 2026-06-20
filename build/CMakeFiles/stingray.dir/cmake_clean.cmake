@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/stingray.dir/link.d"
   "CMakeFiles/stingray.dir/src/main.cpp.o"
   "CMakeFiles/stingray.dir/src/main.cpp.o.d"
   "CMakeFiles/stingray.dir/utils/glad.c.o"

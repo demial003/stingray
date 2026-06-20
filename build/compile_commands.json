@@ -1,20 +1,20 @@
 [
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/stingray.dir/src/main.cpp.o -c /Users/demialao/projects/stingray/src/main.cpp",
-  "file": "/Users/demialao/projects/stingray/src/main.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -std=gnu++17 -o CMakeFiles/stingray.dir/src/main.cpp.o -c /home/demi/projects/stingray/src/main.cpp",
+  "file": "/home/demi/projects/stingray/src/main.cpp",
   "output": "CMakeFiles/stingray.dir/src/main.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/stingray.dir/utils/sphere.cpp.o -c /Users/demialao/projects/stingray/utils/sphere.cpp",
-  "file": "/Users/demialao/projects/stingray/utils/sphere.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -std=gnu++17 -o CMakeFiles/stingray.dir/utils/sphere.cpp.o -c /home/demi/projects/stingray/utils/sphere.cpp",
+  "file": "/home/demi/projects/stingray/utils/sphere.cpp",
   "output": "CMakeFiles/stingray.dir/utils/sphere.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/cc  -I/Users/demialao/projects/stingray/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include  -arch arm64 -o CMakeFiles/stingray.dir/utils/glad.c.o -c /Users/demialao/projects/stingray/utils/glad.c",
-  "file": "/Users/demialao/projects/stingray/utils/glad.c",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/cc  -I/home/demi/projects/stingray/include  -o CMakeFiles/stingray.dir/utils/glad.c.o -c /home/demi/projects/stingray/utils/glad.c",
+  "file": "/home/demi/projects/stingray/utils/glad.c",
   "output": "CMakeFiles/stingray.dir/utils/glad.c.o"
 }
 ]

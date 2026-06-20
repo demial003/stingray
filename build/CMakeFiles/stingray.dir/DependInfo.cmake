@@ -8,9 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/Users/demialao/projects/stingray/utils/glad.c" "CMakeFiles/stingray.dir/utils/glad.c.o" "gcc" "CMakeFiles/stingray.dir/utils/glad.c.o.d"
-  "/Users/demialao/projects/stingray/src/main.cpp" "CMakeFiles/stingray.dir/src/main.cpp.o" "gcc" "CMakeFiles/stingray.dir/src/main.cpp.o.d"
-  "/Users/demialao/projects/stingray/utils/sphere.cpp" "CMakeFiles/stingray.dir/utils/sphere.cpp.o" "gcc" "CMakeFiles/stingray.dir/utils/sphere.cpp.o.d"
+  "/home/demi/projects/stingray/utils/glad.c" "CMakeFiles/stingray.dir/utils/glad.c.o" "gcc" "CMakeFiles/stingray.dir/utils/glad.c.o.d"
+  "/home/demi/projects/stingray/src/main.cpp" "CMakeFiles/stingray.dir/src/main.cpp.o" "gcc" "CMakeFiles/stingray.dir/src/main.cpp.o.d"
+  "/home/demi/projects/stingray/utils/sphere.cpp" "CMakeFiles/stingray.dir/utils/sphere.cpp.o" "gcc" "CMakeFiles/stingray.dir/utils/sphere.cpp.o.d"
+  "" "stingray" "gcc" "CMakeFiles/stingray.dir/link.d"
   )
 
 # Targets to which this target links which contain Fortran sources.
