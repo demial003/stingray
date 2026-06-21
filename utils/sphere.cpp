@@ -1,6 +1,5 @@
 #include "utils/sphere.h"
 #include <cmath>
-#include <iostream>
 
 namespace utils {
 void Sphere::genVertices(float *vboIdx, int *eboIdx) {
