@@ -4,7 +4,7 @@
 namespace utils {
 class Cylinder {
 public:
-  Cylinder() : slices(6), height(2) {}
+  Cylinder() : slices(50), height(2) {}
   void genVertices(float *vboIdx);
   int vboSize();
 

@@ -205,7 +205,7 @@ int main(void) {
     glBindVertexArray(VAO);
     glVertexAttrib3f(vertColorLoc, 0.5f, 0.35f, 0.0f);
     // glDrawElements(GL_TRIANGLES, idxSize, GL_UNSIGNED_INT, 0);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, vertsSize);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, vertsSize / 3);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
