@@ -17,14 +17,8 @@
 const unsigned int SCR_WIDTH = 900;
 const unsigned int SCR_HEIGHT = 900;
 
-unsigned int VAO;
-unsigned int VBO;
-unsigned int EBO;
 unsigned int vertPosLoc = 0;
 unsigned int vertColorLoc = 1;
-unsigned int vertsSize;
-unsigned int verts2Size;
-unsigned int idxSize;
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, -10.0f, 0.0f);
@@ -41,9 +35,6 @@ float lastY = 300;
 
 bool firstMouse = true;
 float fov = 45.0f;
-
-utils::Sphere sphere = utils::Sphere(100, 100);
-utils::Cylinder cylinder = utils::Cylinder(100, 2);
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   if (!glfwWindowShouldClose(window)) {
@@ -116,19 +107,7 @@ void processInput(GLFWwindow *window) {
     cameraPos -= 2.0f * cameraSpeed * cameraUp;
   }
 }
-void setupGeometry() {
-  glGenBuffers(1, &VBO);
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &EBO);
-  glBindVertexArray(VAO);
-
-  vertsSize = cylinder.numVertices();
-  verts2Size = sphere.numVertices();
-  idxSize = sphere.numElements();
-
-  sphere.initializeAtrributeLocations(vertPosLoc);
-  cylinder.initializeAtrributeLocations(vertPosLoc);
-}
+void setupGeometry() {}
 
 int main(void) {
   GLFWwindow *window;
@@ -161,7 +140,14 @@ int main(void) {
   glfwSetScrollCallback(window, scroll_callback);
   glfwSetCursorPosCallback(window, mouse_callback);
 
-  setupGeometry();
+  utils::Sphere sphere = utils::Sphere(100, 100);
+  utils::Cylinder cylinder = utils::Cylinder(100, 2);
+
+  unsigned int vertsSize = cylinder.numVertices();
+  unsigned int idxSize = sphere.numElements();
+
+  sphere.initializeAtrributeLocations(vertPosLoc);
+  cylinder.initializeAtrributeLocations(vertPosLoc);
   utils::Shader shader("../include/utils/shader.vs",
                        "../include/utils/shader.fs");
 

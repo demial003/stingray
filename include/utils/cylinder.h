@@ -7,8 +7,8 @@ class Cylinder : public Mesh {
 public:
   Cylinder() : slices(6), height(2.0f) {}
   Cylinder(int slices, float height) : slices(slices), height(height) {}
-  void genVertices(float *vboIdx, unsigned int *eboIdx = 0);
-  int numVertices();
+  virtual void genVertices(float *vboIdx, unsigned int *eboIdx = 0);
+  virtual int numVertices();
 
 private:
   int slices;

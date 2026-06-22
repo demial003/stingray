@@ -8,6 +8,12 @@ class Mesh {
 public:
   Mesh() {}
   ~Mesh();
+
+  Mesh(const Mesh &) = delete;
+  Mesh &operator=(const Mesh &) = delete;
+  Mesh(Mesh &&) = delete;
+  Mesh &operator=(Mesh &&) = delete;
+
   virtual void initializeAtrributeLocations(unsigned int posLoc);
   virtual void RenderVBO(GLuint drawMode, unsigned int first,
                          unsigned int numVerts);

@@ -10,10 +10,10 @@ public:
     slices = val1;
     stacks = val2;
   }
-  int numVertices();
-  int numElements();
+  virtual int numVertices();
+  virtual int numElements();
 
-  void genVertices(float *vboIdx, unsigned int *eboIdx);
+  virtual void genVertices(float *vboIdx, unsigned int *eboIdx);
 
 private:
   int slices;
