@@ -2,7 +2,7 @@
 #include <cmath>
 
 namespace utils {
-void Sphere::genVertices(float *vboIdx, int *eboIdx) {
+void Sphere::genVertices(float *vboIdx, unsigned int *eboIdx) {
 
   for (auto i = 0; i < slices; i++) {
     float theta = 2.0 * M_PI * float(i % slices) / (float)slices;
@@ -60,6 +60,6 @@ int Sphere::getVertexNumber(int i, int j) {
   }
 }
 
-int Sphere::vboSize() { return 3 * (slices * (stacks - 1) + 2); }
-int Sphere::eboSize() { return 6 * slices * (stacks - 1); }
+int Sphere::numVertices() { return 3 * (slices * (stacks - 1) + 2); }
+int Sphere::numElements() { return 6 * slices * (stacks - 1); }
 } // namespace utils

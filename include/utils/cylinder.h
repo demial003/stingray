@@ -1,12 +1,14 @@
 #ifndef CYLINDER_H
 #define CYLINDER_H
 
+#include "utils/mesh.h"
 namespace utils {
-class Cylinder {
+class Cylinder : public Mesh {
 public:
-  Cylinder() : slices(50), height(2) {}
-  void genVertices(float *vboIdx);
-  int vboSize();
+  Cylinder() : slices(6), height(2.0f) {}
+  Cylinder(int slices, float height) : slices(slices), height(height) {}
+  void genVertices(float *vboIdx, unsigned int *eboIdx = 0);
+  int numVertices();
 
 private:
   int slices;

@@ -9,7 +9,8 @@ include_directories(include)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 
-add_executable(stingray src/main.cpp utils/sphere.cpp utils/glad.c utils/cylinder.cpp)
+add_executable(stingray src/main.cpp utils/sphere.cpp utils/glad.c
+                        utils/cylinder.cpp utils/mesh.cpp)
 
 target_link_libraries(stingray OpenGL::GL glfw dl)
 

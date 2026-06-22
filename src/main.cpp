@@ -1,3 +1,4 @@
+#include "utils/mesh.h"
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
@@ -6,6 +7,7 @@
 #include <utils/cylinder.h>
 #include <utils/shader.h>
 #include <utils/sphere.h>
+#include <vector>
 
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/glm.hpp>
@@ -21,6 +23,7 @@ unsigned int EBO;
 unsigned int vertPosLoc = 0;
 unsigned int vertColorLoc = 1;
 unsigned int vertsSize;
+unsigned int verts2Size;
 unsigned int idxSize;
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
@@ -116,24 +119,39 @@ void setupGeometry() {
   glGenBuffers(1, &EBO);
   glBindVertexArray(VAO);
 
-  // utils::Sphere sphere = utils::Sphere(100, 100);
-  utils::Cylinder cylinder = utils::Cylinder();
-  vertsSize = cylinder.vboSize();
-  // idxSize = sphere.eboSize();
-  float vertices[vertsSize];
-  int indices[idxSize];
-  // sphere.genVertices(vertices, indices);
-  cylinder.genVertices(vertices);
+  utils::Sphere sphere = utils::Sphere(100, 100);
+  utils::Cylinder cylinder = utils::Cylinder(100, 2);
 
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  vertsSize = cylinder.numVertices();
+  verts2Size = sphere.numVertices();
+  idxSize = sphere.numElements();
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-               GL_STATIC_DRAW);
-  glVertexAttribPointer(vertPosLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-                        (void *)0);
-  glEnableVertexAttribArray(vertPosLoc);
+  sphere.initializeAtrributeLocations(vertPosLoc);
+  // cylinder.initializeAtrributeLocations(vertPosLoc);
+
+  // sphere.RenderEBO(GL_TRIANGLES, idxSize);
+  // cylinder.RenderVBO(GL_TRIANGLE_STRIP, verts2Size / 3, vertsSize / 3);
+
+  // std::vector<float> vertices(vertsSize + verts2Size);
+  // std::vector<unsigned int> indices(idxSize);
+  //
+  // sphere.genVertices(vertices.data(), indices.data());
+  // cylinder.genVertices(vertices.data() + verts2Size);
+  //
+  // glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  // glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
+  //              vertices.data(), GL_STATIC_DRAW);
+  //
+  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int),
+  //              indices.data(), GL_STATIC_DRAW);
+  // glVertexAttribPointer(vertPosLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+  //                       (void *)0);
+  // glEnableVertexAttribArray(vertPosLoc);
+  //
+  // glBindVertexArray(0);
+  // glBindBuffer(GL_ARRAY_BUFFER, 0);
+  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 int main(void) {
@@ -160,7 +178,7 @@ int main(void) {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
   glCullFace(GL_BACK);
-  // glEnable(GL_CULL_FACE);
+  glEnable(GL_CULL_FACE);
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -202,10 +220,10 @@ int main(void) {
     glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
-    glBindVertexArray(VAO);
-    glVertexAttrib3f(vertColorLoc, 0.5f, 0.35f, 0.0f);
+    // glBindVertexArray(VAO);
+    // glVertexAttrib3f(vertColorLoc, 0.5f, 0.35f, 0.0f);
     // glDrawElements(GL_TRIANGLES, idxSize, GL_UNSIGNED_INT, 0);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, vertsSize / 3);
+    // glDrawArrays(GL_TRIANGLE_STRIP, verts2Size / 3, vertsSize / 3);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

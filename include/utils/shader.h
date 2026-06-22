@@ -81,6 +81,8 @@ public:
     glDeleteShader(vertex);
     glDeleteShader(fragment);
   }
+
+  ~Shader() { glDeleteProgram(ID); }
   void use() { glUseProgram(ID); }
 
   void setBool(const std::string &name, bool value) const {

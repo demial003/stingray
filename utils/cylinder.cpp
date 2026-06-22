@@ -3,7 +3,7 @@
 #include <iostream>
 
 namespace utils {
-void Cylinder::genVertices(float *vboIdx) {
+void Cylinder::genVertices(float *vboIdx, unsigned int *eboIdx) {
   for (auto j = 0; j <= slices; j++) {
     float phi = (float)(j % slices) / float(slices) * M_PI * 2.0f;
     float x = cos(phi);
@@ -20,5 +20,5 @@ void Cylinder::genVertices(float *vboIdx) {
   }
 }
 
-int Cylinder::vboSize() { return 6 * (slices + 1); }
+int Cylinder::numVertices() { return 6 * (slices + 1); }
 } // namespace utils
