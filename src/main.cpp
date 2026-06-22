@@ -42,6 +42,9 @@ float lastY = 300;
 bool firstMouse = true;
 float fov = 45.0f;
 
+utils::Sphere sphere = utils::Sphere(100, 100);
+utils::Cylinder cylinder = utils::Cylinder(100, 2);
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   if (!glfwWindowShouldClose(window)) {
     glViewport(0, 0, width, height);
@@ -119,39 +122,12 @@ void setupGeometry() {
   glGenBuffers(1, &EBO);
   glBindVertexArray(VAO);
 
-  utils::Sphere sphere = utils::Sphere(100, 100);
-  utils::Cylinder cylinder = utils::Cylinder(100, 2);
-
   vertsSize = cylinder.numVertices();
   verts2Size = sphere.numVertices();
   idxSize = sphere.numElements();
 
   sphere.initializeAtrributeLocations(vertPosLoc);
-  // cylinder.initializeAtrributeLocations(vertPosLoc);
-
-  // sphere.RenderEBO(GL_TRIANGLES, idxSize);
-  // cylinder.RenderVBO(GL_TRIANGLE_STRIP, verts2Size / 3, vertsSize / 3);
-
-  // std::vector<float> vertices(vertsSize + verts2Size);
-  // std::vector<unsigned int> indices(idxSize);
-  //
-  // sphere.genVertices(vertices.data(), indices.data());
-  // cylinder.genVertices(vertices.data() + verts2Size);
-  //
-  // glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  // glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
-  //              vertices.data(), GL_STATIC_DRAW);
-  //
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int),
-  //              indices.data(), GL_STATIC_DRAW);
-  // glVertexAttribPointer(vertPosLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-  //                       (void *)0);
-  // glEnableVertexAttribArray(vertPosLoc);
-  //
-  // glBindVertexArray(0);
-  // glBindBuffer(GL_ARRAY_BUFFER, 0);
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  cylinder.initializeAtrributeLocations(vertPosLoc);
 }
 
 int main(void) {
@@ -201,9 +177,6 @@ int main(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::mat4 model = glm::mat4(1.0f);
-    // model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f),
-    // glm::vec3(1.0f, 0.0f, 1.0f));
-    // model = glm::translate(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
     glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
@@ -220,10 +193,8 @@ int main(void) {
     glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
-    // glBindVertexArray(VAO);
-    // glVertexAttrib3f(vertColorLoc, 0.5f, 0.35f, 0.0f);
-    // glDrawElements(GL_TRIANGLES, idxSize, GL_UNSIGNED_INT, 0);
-    // glDrawArrays(GL_TRIANGLE_STRIP, verts2Size / 3, vertsSize / 3);
+    sphere.RenderEBO(GL_TRIANGLES, idxSize);
+    cylinder.RenderVBO(GL_TRIANGLE_STRIP, 0, vertsSize / 3);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

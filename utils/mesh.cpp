@@ -16,9 +16,9 @@ void Mesh::initializeAtrributeLocations(unsigned int posLoc) {
   int numElems = numElements();
   vertPosLoc = posLoc;
 
+  glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, 3 * numVerts * sizeof(float), 0,
-               GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, numVerts * sizeof(float), 0, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, numElems * sizeof(int), 0,
@@ -39,7 +39,6 @@ void Mesh::CalcVboAndEbo() {
   float *vboBuffer = (float *)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
   unsigned int *eboBuffer =
       (unsigned int *)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
-  std::cout << "here\n";
   genVertices(vboBuffer, eboBuffer);
   glUnmapBuffer(GL_ARRAY_BUFFER);
   glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
