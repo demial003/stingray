@@ -41,7 +41,7 @@ private:
 
 public:
   ParticleDrag(real k1, real k2);
-  virtual void updateForce(Particle *particle, real duration)
+  virtual void updateForce(Particle *particle, real duration);
 };
 
 } // namespace stingray

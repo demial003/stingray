@@ -7,7 +7,6 @@
 #include <utils/cylinder.h>
 #include <utils/shader.h>
 #include <utils/sphere.h>
-#include <vector>
 
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/glm.hpp>
@@ -19,6 +18,12 @@ const unsigned int SCR_HEIGHT = 900;
 
 unsigned int vertPosLoc = 0;
 unsigned int vertColorLoc = 1;
+
+utils::Sphere sphere = utils::Sphere(100, 100);
+utils::Cylinder cylinder = utils::Cylinder(100, 2);
+
+unsigned int vertsSize = cylinder.numVertices();
+unsigned int idxSize = sphere.numElements();
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, -10.0f, 0.0f);
@@ -107,7 +112,30 @@ void processInput(GLFWwindow *window) {
     cameraPos -= 2.0f * cameraSpeed * cameraUp;
   }
 }
-void setupGeometry() {}
+void renderScene(utils::Shader shader) {
+  glm::mat4 model = glm::mat4(1.0f);
+  model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
+  model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
+
+  glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+  glm::mat4 projection = glm::mat4(1.0f);
+  projection = glm::perspective(
+      (glm::radians(fov)), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+
+  unsigned int view_loc = glGetUniformLocation(shader.ID, "view");
+  unsigned int projection_loc = glGetUniformLocation(shader.ID, "projection");
+  unsigned int model_loc = glGetUniformLocation(shader.ID, "model");
+
+  glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
+  glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
+  glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+
+  cylinder.RenderVBO(GL_TRIANGLE_STRIP, 0, vertsSize / 3);
+  model = glm::mat4(1.0f);
+  glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+  sphere.RenderEBO(GL_TRIANGLES, idxSize);
+}
 
 int main(void) {
   GLFWwindow *window;
@@ -133,18 +161,12 @@ int main(void) {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
   glCullFace(GL_BACK);
-  glEnable(GL_CULL_FACE);
+  // glEnable(GL_CULL_FACE);
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glfwSetScrollCallback(window, scroll_callback);
   glfwSetCursorPosCallback(window, mouse_callback);
-
-  utils::Sphere sphere = utils::Sphere(100, 100);
-  utils::Cylinder cylinder = utils::Cylinder(100, 2);
-
-  unsigned int vertsSize = cylinder.numVertices();
-  unsigned int idxSize = sphere.numElements();
 
   sphere.initializeAtrributeLocations(vertPosLoc);
   cylinder.initializeAtrributeLocations(vertPosLoc);
@@ -161,26 +183,7 @@ int main(void) {
 
     glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glm::mat4 model = glm::mat4(1.0f);
-
-    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
-    glm::mat4 projection = glm::mat4(1.0f);
-    projection =
-        glm::perspective((glm::radians(fov)),
-                         (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-
-    unsigned int view_loc = glGetUniformLocation(shader.ID, "view");
-    unsigned int projection_loc = glGetUniformLocation(shader.ID, "projection");
-    unsigned int model_loc = glGetUniformLocation(shader.ID, "model");
-
-    glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
-    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
-
-    sphere.RenderEBO(GL_TRIANGLES, idxSize);
-    cylinder.RenderVBO(GL_TRIANGLE_STRIP, 0, vertsSize / 3);
+    renderScene(shader);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
