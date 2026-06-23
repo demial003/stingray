@@ -1,6 +1,5 @@
-#include "utils/cylinder.h"
 #include <cmath>
-#include <iostream>
+#include <utils/cylinder.h>
 
 namespace utils {
 void Cylinder::genVertices(float *vboIdx, unsigned int *eboIdx) {

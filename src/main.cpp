@@ -32,7 +32,6 @@ struct Bob {
 
     model =
         glm::translate(model, glm::vec3(position.x, position.y, position.z));
-    stingray::Vec3 accel = particle.getAcceleration();
     // std::cout << position.x << ", " << position.y << ", " << position.z <<
     // "\n"; std::cout << particle.forceAccum.x << ", " << particle.forceAccum.y
     // << ", "
@@ -52,7 +51,7 @@ struct Rod {
   stingray::ParticleRod rod;
 };
 
-const unsigned int SCR_WIDTH = 900;
+const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 900;
 
 unsigned int vertPosLoc = 0;
@@ -150,8 +149,8 @@ void processInput(GLFWwindow *window) {
 }
 void renderScene(utils::Shader shader) {
   glm::mat4 model = glm::mat4(1.0f);
-  // model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
-  // model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
+  model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
+  model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
 
   glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
@@ -165,8 +164,10 @@ void renderScene(utils::Shader shader) {
 
   glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
   glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
+  glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
-  // cylinder.RenderVBO(GL_TRIANGLE_STRIP, 0, vertsSize / 3);
+  cylinder.RenderVBO(GL_TRIANGLE_STRIP, 0, vertsSize / 3);
+  b.particle.addForce(GRAVITY);
   b.particle.integrate(deltaTime);
   b.render(GL_TRIANGLES, idxSize, model_loc, sphere);
 }
@@ -208,7 +209,6 @@ int main(void) {
                        "../include/utils/shader.fs");
   b.particle.setPosition(0.0f, 0.0f, 0.0f);
   b.particle.setVelocity(0.0f, 0.0f, 0.0f);
-  b.particle.addForce(GRAVITY);
   b.particle.setMass(1.0f);
   b.particle.damping = 0.99f;
 
