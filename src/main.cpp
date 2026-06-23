@@ -1,9 +1,11 @@
+#include "stingray/particle.h"
 #include "utils/mesh.h"
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include <stingray/particle.h>
+#include <stingray/pfgen.h>
+#include <stingray/plinks.h>
 #include <utils/cylinder.h>
 #include <utils/shader.h>
 #include <utils/sphere.h>
@@ -12,6 +14,43 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+stingray::Vec3 GRAVITY(0.0, -9.81, 0.0);
+stingray::ParticleGravity gravity(GRAVITY);
+
+struct Bob {
+  stingray::Particle particle;
+  stingray::ParticleRod rod;
+
+  void render(glm::mat4 model, int idxSize, int model_loc,
+              utils::Sphere &sphere) {
+    stingray::Vec3 position;
+    particle.getPosition(&position);
+
+    model =
+        glm::translate(model, glm::vec3(position.x, position.y, position.z));
+    stingray::Vec3 accel = particle.getAcceleration();
+    // std::cout << position.x << ", " << position.y << ", " << position.z <<
+    // "\n"; std::cout << particle.forceAccum.x << ", " << particle.forceAccum.y
+    // << ", "
+    //           << particle.forceAccum.z << "\n";
+    // std::cout << "-----------------------\n";
+
+    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+    sphere.RenderEBO(GL_TRIANGLES, idxSize);
+  }
+};
+
+Bob b;
+
+struct Rod {
+  utils::Cylinder cylinder;
+  stingray::Particle particle;
+  stingray::ParticleRod rod;
+};
 
 const unsigned int SCR_WIDTH = 900;
 const unsigned int SCR_HEIGHT = 900;
@@ -25,12 +64,9 @@ utils::Cylinder cylinder = utils::Cylinder(100, 2);
 unsigned int vertsSize = cylinder.numVertices();
 unsigned int idxSize = sphere.numElements();
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, -10.0f, 0.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 10.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
 
 float yaw = -90.0f;
 float pitch = 0.0f;
@@ -114,8 +150,8 @@ void processInput(GLFWwindow *window) {
 }
 void renderScene(utils::Shader shader) {
   glm::mat4 model = glm::mat4(1.0f);
-  model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
-  model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
+  // model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
+  // model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
 
   glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
@@ -129,12 +165,10 @@ void renderScene(utils::Shader shader) {
 
   glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
   glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
-  glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
-  cylinder.RenderVBO(GL_TRIANGLE_STRIP, 0, vertsSize / 3);
-  model = glm::mat4(1.0f);
-  glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
-  sphere.RenderEBO(GL_TRIANGLES, idxSize);
+  // cylinder.RenderVBO(GL_TRIANGLE_STRIP, 0, vertsSize / 3);
+  b.particle.integrate(deltaTime);
+  b.render(GL_TRIANGLES, idxSize, model_loc, sphere);
 }
 
 int main(void) {
@@ -168,10 +202,15 @@ int main(void) {
   glfwSetScrollCallback(window, scroll_callback);
   glfwSetCursorPosCallback(window, mouse_callback);
 
-  sphere.initializeAtrributeLocations(vertPosLoc);
   cylinder.initializeAtrributeLocations(vertPosLoc);
+  sphere.initializeAtrributeLocations(vertPosLoc);
   utils::Shader shader("../include/utils/shader.vs",
                        "../include/utils/shader.fs");
+  b.particle.setPosition(0.0f, 0.0f, 0.0f);
+  b.particle.setVelocity(0.0f, 0.0f, 0.0f);
+  b.particle.addForce(GRAVITY);
+  b.particle.setMass(1.0f);
+  b.particle.damping = 0.99f;
 
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
@@ -186,7 +225,7 @@ int main(void) {
     renderScene(shader);
 
     glfwSwapBuffers(window);
-    glfwPollEvents();
+    glfwWaitEventsTimeout(1.0 / 60.0);
   }
 
   glfwTerminate();

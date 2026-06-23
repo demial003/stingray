@@ -6,8 +6,8 @@ real ParticleLink::currentLength() const {
   return relativePos.magnitude();
 }
 
-unsigned ParticleCable::fillContact(ParticleContact *contact,
-                                    unsigned limit) const {
+unsigned ParticleCable::addContact(ParticleContact *contact,
+                                   unsigned limit) const {
   real length = currentLength();
 
   if (length < maxLength)
@@ -26,8 +26,8 @@ unsigned ParticleCable::fillContact(ParticleContact *contact,
   return 1;
 }
 
-unsigned ParticleRod::fillContact(ParticleContact *contact,
-                                  unsigned limit) const {
+unsigned ParticleRod::addContact(ParticleContact *contact,
+                                 unsigned limit) const {
   real currentLen = currentLength();
 
   if (currentLen == length) {

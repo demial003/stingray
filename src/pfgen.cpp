@@ -1,6 +1,6 @@
 #include <stingray/pfgen.h>
-using namespace stingray;
 
+using namespace stingray;
 void ParticleForceRegistry::add(Particle *particle,
                                 ParticleForceGenerator *fg) {
   registrations.push_back({particle, fg});
