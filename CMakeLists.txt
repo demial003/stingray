@@ -4,6 +4,17 @@ project(stingray)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE
+      Debug
+      CACHE STRING "Build type" FORCE)
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0 -DDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNEDEBUG")
+
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
 include_directories(include)
 
 find_package(OpenGL REQUIRED)

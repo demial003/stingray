@@ -32,11 +32,6 @@ struct Bob {
 
     model =
         glm::translate(model, glm::vec3(position.x, position.y, position.z));
-    // std::cout << position.x << ", " << position.y << ", " << position.z <<
-    // "\n"; std::cout << particle.forceAccum.x << ", " << particle.forceAccum.y
-    // << ", "
-    //           << particle.forceAccum.z << "\n";
-    // std::cout << "-----------------------\n";
 
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
     sphere.RenderEBO(GL_TRIANGLES, idxSize);
