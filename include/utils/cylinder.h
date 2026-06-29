@@ -9,6 +9,7 @@ public:
   Cylinder(int slices, float height) : slices(slices), height(height) {}
   virtual void genVertices(float *vboIdx, unsigned int *eboIdx = 0);
   virtual int numVertices();
+  float getHeight() { return height; }
 
 private:
   int slices;

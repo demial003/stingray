@@ -44,14 +44,9 @@ struct Rod {
   stingray::ParticleRod rod;
   void render(glm::mat4 model, GLuint drawMode, int model_loc,
               utils::Cylinder &cylinder, int vertSize) {
-    stingray::Vec3 position;
-    particle.getPosition(&position);
-
-    model =
-        glm::translate(model, glm::vec3(position.x, position.y, position.z));
 
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
-    cylinder.RenderVBO(GL_TRIANGLE_STRIP, 0, vertSize);
+    cylinder.RenderVBO(drawMode, 0, vertSize);
   }
 };
 
@@ -218,7 +213,7 @@ int main(void) {
   stingray::ParticleWorld world(2, 4);
   r.rod.particle[0] = &b.particle;
   r.rod.particle[1] = &r.particle;
-  r.rod.length = 2.0;
+  r.rod.length = cylinder.getHeight();
   world.getContactGenerators().push_back(&r.rod);
 
   // r.particle.addForce(GRAVITY);
@@ -228,8 +223,8 @@ int main(void) {
   b.particle.setMass(1.0f);
   b.particle.damping = 0.99f;
 
-  r.particle.setPosition(0.0, 0.5, 0.0);
-  r.particle.setMass(1.0f);
+  r.particle.setPosition(0.0, cylinder.getHeight(), 0.0);
+  r.particle.setInverseMass(0);
   r.particle.damping = 0.99f;
 
   while (!glfwWindowShouldClose(window)) {
