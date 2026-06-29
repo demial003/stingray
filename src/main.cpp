@@ -20,7 +20,7 @@
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-stingray::Vec3 GRAVITY(0.0, -1.81, 0.0);
+stingray::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
 struct Bob {
   stingray::Particle particle;
@@ -45,6 +45,7 @@ struct Rod {
   void render(glm::mat4 model, GLuint drawMode, int model_loc,
               utils::Cylinder &cylinder, int vertSize) {
     stingray::Vec3 position = particle.getPosition();
+    model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
     model =
         glm::translate(model, glm::vec3(position.x, position.y, position.z));
 
@@ -68,7 +69,7 @@ utils::Cylinder cylinder = utils::Cylinder(100, 2);
 unsigned int vertsSize = cylinder.numVertices();
 unsigned int idxSize = sphere.numElements();
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 10.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 30.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -154,7 +155,6 @@ void processInput(GLFWwindow *window) {
 }
 void renderScene(utils::Shader shader) {
   glm::mat4 model = glm::mat4(1.0f);
-  model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
 
   glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
@@ -210,19 +210,20 @@ int main(void) {
   utils::Shader shader("../shaders/shader.vs", "../shaders/shader.fs");
 
   stingray::ParticleWorld world(2, 4);
-  r.rod.particle[0] = &b.particle;
-  r.rod.particle[1] = &r.particle;
+  r.rod.particle[0] = &r.particle;
+  r.rod.particle[1] = &b.particle;
+
   r.rod.length = cylinder.getHeight();
   world.getParticles().push_back(&b.particle);
   world.getParticles().push_back(&r.particle);
   world.getContactGenerators().push_back(&r.rod);
 
-  b.particle.setPosition(0.0, 0.0, 0.0);
+  b.particle.setPosition(5.0, 5.0, 0.0);
   b.particle.setMass(1.0f);
   b.particle.damping = 0.99f;
   b.particle.setAcceleration(GRAVITY);
 
-  r.particle.setPosition(0.0, cylinder.getHeight(), 0.0);
+  r.particle.setPosition(0.0, cylinder.getHeight() * 1.5, 0.0);
   r.particle.setInverseMass(0);
   r.particle.damping = 0.99f;
 
@@ -239,9 +240,11 @@ int main(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderScene(shader);
 
-    world.runPhysics(deltaTime);
+    world.runPhysics(1.0 / 60.0);
+    fprintf(stderr, "dist=%f\n",
+            (b.particle.getPosition() - r.particle.getPosition()).magnitude());
     glfwSwapBuffers(window);
-    glfwWaitEventsTimeout(deltaTime);
+    glfwWaitEventsTimeout(1.0 / 60.0);
   }
 
   glfwTerminate();
