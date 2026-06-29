@@ -47,3 +47,5 @@ void ParticleWorld::runPhysics(real duration) {
 ParticleWorld::ContactGenerators &ParticleWorld::getContactGenerators() {
   return contactGenerators;
 }
+
+ParticleWorld::Particles &ParticleWorld::getParticles() { return particles; }

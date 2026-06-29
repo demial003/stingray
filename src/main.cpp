@@ -44,6 +44,9 @@ struct Rod {
   stingray::ParticleRod rod;
   void render(glm::mat4 model, GLuint drawMode, int model_loc,
               utils::Cylinder &cylinder, int vertSize) {
+    stingray::Vec3 position = particle.getPosition();
+    model =
+        glm::translate(model, glm::vec3(position.x, position.y, position.z));
 
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
     cylinder.RenderVBO(drawMode, 0, vertSize);
@@ -151,8 +154,6 @@ void processInput(GLFWwindow *window) {
 }
 void renderScene(utils::Shader shader) {
   glm::mat4 model = glm::mat4(1.0f);
-  model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
-  // model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
   model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
 
   glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -167,9 +168,7 @@ void renderScene(utils::Shader shader) {
 
   glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
   glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
-  glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
-  b.particle.integrate(deltaTime);
   r.render(model, GL_TRIANGLE_STRIP, model_loc, cylinder, vertsSize / 3);
   model = glm::mat4(1.0f);
   b.render(model, GL_TRIANGLES, idxSize, model_loc, sphere);
@@ -214,14 +213,14 @@ int main(void) {
   r.rod.particle[0] = &b.particle;
   r.rod.particle[1] = &r.particle;
   r.rod.length = cylinder.getHeight();
+  world.getParticles().push_back(&b.particle);
+  world.getParticles().push_back(&r.particle);
   world.getContactGenerators().push_back(&r.rod);
 
-  // r.particle.addForce(GRAVITY);
-  b.particle.setAcceleration(GRAVITY);
-
-  b.particle.setPosition(0.0, 1.0, 0.0);
+  b.particle.setPosition(0.0, 0.0, 0.0);
   b.particle.setMass(1.0f);
   b.particle.damping = 0.99f;
+  b.particle.setAcceleration(GRAVITY);
 
   r.particle.setPosition(0.0, cylinder.getHeight(), 0.0);
   r.particle.setInverseMass(0);
@@ -240,9 +239,9 @@ int main(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderScene(shader);
 
-    world.runPhysics(1.0 / 60);
+    world.runPhysics(deltaTime);
     glfwSwapBuffers(window);
-    glfwWaitEventsTimeout(1.0 / 60.0);
+    glfwWaitEventsTimeout(deltaTime);
   }
 
   glfwTerminate();

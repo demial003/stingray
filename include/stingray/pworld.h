@@ -31,6 +31,7 @@ public:
   void startFrame();
   unsigned generateContacts();
   ContactGenerators &getContactGenerators();
+  Particles &getParticles();
   void integrate(real duration);
   void runPhysics(real duration);
 };
