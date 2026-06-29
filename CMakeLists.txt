@@ -20,6 +20,7 @@ include_directories(include)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 
+add_compile_options(-Wall -Wextra)
 add_executable(
   stingray
   src/main.cpp
@@ -30,6 +31,7 @@ add_executable(
   src/particle.cpp
   src/pcontacts.cpp
   src/pfgen.cpp
+  src/pworld.cpp
   src/plinks.cpp)
 
 target_link_libraries(stingray OpenGL::GL glfw dl)

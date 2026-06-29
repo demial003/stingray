@@ -1,11 +1,13 @@
+#include "glm/ext/matrix_transform.hpp"
 #include "stingray/particle.h"
 #include "utils/mesh.h"
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include <stingray/pfgen.h>
-#include <stingray/plinks.h>
+
+#include <stingray/pworld.h>
+
 #include <utils/cylinder.h>
 #include <utils/shader.h>
 #include <utils/sphere.h>
@@ -18,14 +20,12 @@
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-stingray::Vec3 GRAVITY(0.0, -9.81, 0.0);
-stingray::ParticleGravity gravity(GRAVITY);
+stingray::Vec3 GRAVITY(0.0, -1.81, 0.0);
 
 struct Bob {
   stingray::Particle particle;
-  stingray::ParticleRod rod;
 
-  void render(glm::mat4 model, int idxSize, int model_loc,
+  void render(glm::mat4 model, GLuint drawMode, int idxSize, int model_loc,
               utils::Sphere &sphere) {
     stingray::Vec3 position;
     particle.getPosition(&position);
@@ -34,17 +34,29 @@ struct Bob {
         glm::translate(model, glm::vec3(position.x, position.y, position.z));
 
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
-    sphere.RenderEBO(GL_TRIANGLES, idxSize);
+    sphere.RenderEBO(drawMode, idxSize);
   }
 };
-
-Bob b;
 
 struct Rod {
   utils::Cylinder cylinder;
   stingray::Particle particle;
   stingray::ParticleRod rod;
+  void render(glm::mat4 model, GLuint drawMode, int model_loc,
+              utils::Cylinder &cylinder, int vertSize) {
+    stingray::Vec3 position;
+    particle.getPosition(&position);
+
+    model =
+        glm::translate(model, glm::vec3(position.x, position.y, position.z));
+
+    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+    cylinder.RenderVBO(GL_TRIANGLE_STRIP, 0, vertSize);
+  }
 };
+
+Bob b;
+Rod r;
 
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 900;
@@ -145,6 +157,7 @@ void processInput(GLFWwindow *window) {
 void renderScene(utils::Shader shader) {
   glm::mat4 model = glm::mat4(1.0f);
   model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
+  // model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
   model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
 
   glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -161,10 +174,10 @@ void renderScene(utils::Shader shader) {
   glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
   glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
-  cylinder.RenderVBO(GL_TRIANGLE_STRIP, 0, vertsSize / 3);
-  b.particle.addForce(GRAVITY);
   b.particle.integrate(deltaTime);
-  b.render(GL_TRIANGLES, idxSize, model_loc, sphere);
+  r.render(model, GL_TRIANGLE_STRIP, model_loc, cylinder, vertsSize / 3);
+  model = glm::mat4(1.0f);
+  b.render(model, GL_TRIANGLES, idxSize, model_loc, sphere);
 }
 
 int main(void) {
@@ -200,12 +213,24 @@ int main(void) {
 
   cylinder.initializeAtrributeLocations(vertPosLoc);
   sphere.initializeAtrributeLocations(vertPosLoc);
-  utils::Shader shader("../include/utils/shader.vs",
-                       "../include/utils/shader.fs");
-  b.particle.setPosition(0.0f, 0.0f, 0.0f);
-  b.particle.setVelocity(0.0f, 0.0f, 0.0f);
+  utils::Shader shader("../shaders/shader.vs", "../shaders/shader.fs");
+
+  stingray::ParticleWorld world(2, 4);
+  r.rod.particle[0] = &b.particle;
+  r.rod.particle[1] = &r.particle;
+  r.rod.length = 2.0;
+  world.getContactGenerators().push_back(&r.rod);
+
+  // r.particle.addForce(GRAVITY);
+  b.particle.setAcceleration(GRAVITY);
+
+  b.particle.setPosition(0.0, 1.0, 0.0);
   b.particle.setMass(1.0f);
   b.particle.damping = 0.99f;
+
+  r.particle.setPosition(0.0, 0.5, 0.0);
+  r.particle.setMass(1.0f);
+  r.particle.damping = 0.99f;
 
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
@@ -214,11 +239,13 @@ int main(void) {
 
     shader.use();
     processInput(window);
+    world.startFrame();
 
     glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderScene(shader);
 
+    world.runPhysics(1.0 / 60);
     glfwSwapBuffers(window);
     glfwWaitEventsTimeout(1.0 / 60.0);
   }

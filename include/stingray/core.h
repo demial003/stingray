@@ -2,7 +2,8 @@
 #define CORE_H
 
 #include <cmath>
-#include <stingray/precision.h>
+// #include <stingray/precision.h>
+typedef float real;
 
 namespace stingray {
 class Vec3 {
@@ -20,7 +21,7 @@ public:
   }
 
   Vec3 operator+(const Vec3 &v) const {
-    return Vec3(x + v.z, y + v.y, z + v.z);
+    return Vec3(x + v.x, y + v.y, z + v.z);
   }
 
   Vec3 operator-(const Vec3 &v) const {

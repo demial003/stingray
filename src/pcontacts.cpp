@@ -88,13 +88,15 @@ void ParticleContactResolver::resolveContacts(ParticleContact *contactArray,
   while (iterationsUsed < iterations) {
     real max = 0;
     unsigned maxIndex = numContacts;
-    for (auto i = 0; i < numContacts; i++) {
+    for (unsigned int i = 0; i < numContacts; i++) {
       real sepVel = contactArray[i].calculateSeparatingVelocity();
       if (sepVel < max) {
         max = sepVel;
         maxIndex = i;
       }
     }
+    if (maxIndex == numContacts)
+      break;
     contactArray[maxIndex].resolve(duration);
     iterationsUsed++;
   }

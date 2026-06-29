@@ -1,36 +1,37 @@
 #include <stingray/pworld.h>
 using namespace stingray;
 
+ParticleWorld::ParticleWorld(unsigned maxContacts, unsigned iterations)
+    : resolver(iterations), maxContacts(maxContacts) {
+  contacts = new ParticleContact[maxContacts];
+  calculateIterations = (iterations == 0);
+}
+
+ParticleWorld::~ParticleWorld() { delete[] contacts; }
+
 void ParticleWorld::startFrame() {
-  ParticleRegistration *reg = firstParticle;
-  while (reg) {
-    reg->particle->clearAccumulator();
-    reg = reg->next;
+  for (Particles::iterator p = particles.begin(); p != particles.end(); p++) {
+    (*p)->clearAccumulator();
   }
 }
 unsigned ParticleWorld::generateContacts() {
   unsigned limit = maxContacts;
   ParticleContact *nextContact = contacts;
-  ContactGenRegistration *reg = firstContactGen;
-
-  while (reg) {
-    unsigned used = reg->gen->addContact(nextContact, limit);
+  for (ContactGenerators::iterator g = contactGenerators.begin();
+       g != contactGenerators.end(); g++) {
+    unsigned used = (*g)->addContact(nextContact, limit);
     limit -= used;
     nextContact += used;
 
     if (limit <= 0)
       break;
-    reg = reg->next;
   }
-
   return maxContacts - limit;
 }
 
 void ParticleWorld::integrate(real duration) {
-  ParticleRegistration *reg = firstParticle;
-  while (reg) {
-    reg->particle->integrate(duration);
-    reg = reg->next;
+  for (Particles::iterator p = particles.begin(); p != particles.end(); p++) {
+    (*p)->integrate(duration);
   }
 }
 
@@ -41,4 +42,8 @@ void ParticleWorld::runPhysics(real duration) {
   if (calculateIterations)
     resolver.setIterations(usedContacts * 2);
   resolver.resolveContacts(contacts, usedContacts, duration);
+}
+
+ParticleWorld::ContactGenerators &ParticleWorld::getContactGenerators() {
+  return contactGenerators;
 }
