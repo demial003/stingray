@@ -39,7 +39,6 @@ struct Bob {
 };
 
 struct Rod {
-  utils::Cylinder cylinder;
   stingray::Particle particle;
   stingray::ParticleRod rod;
   void render(glm::mat4 model, GLuint drawMode, int model_loc,
