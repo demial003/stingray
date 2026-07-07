@@ -51,13 +51,13 @@ void Mesh::CalcVboAndEbo() {
 void Mesh::RenderVBO(GLuint drawMode, unsigned int first,
                      unsigned int numVerts) {
   glBindVertexArray(VAO);
-  glVertexAttrib3f(vertColorLoc, 0.5f, 0.35f, 0.0f);
+  // glVertexAttrib3f(vertColorLoc, 0.5f, 0.35f, 0.0f);
   glDrawArrays(drawMode, first, numVerts);
 }
 
 void Mesh::RenderEBO(GLuint drawMode, unsigned int numElems) {
   glBindVertexArray(VAO);
-  glVertexAttrib3f(vertColorLoc, 0.5f, 0.35f, 0.0f);
+  // glVertexAttrib3f(vertColorLoc, 0.5f, 0.35f, 0.0f);
   glDrawElements(drawMode, numElems, GL_UNSIGNED_INT, 0);
 }
 

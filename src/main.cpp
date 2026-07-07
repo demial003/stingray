@@ -1,24 +1,30 @@
-#include "glm/ext/matrix_transform.hpp"
-#include "stingray/particle.h"
-#include "utils/mesh.h"
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
+
 #include <iostream>
 
+#include <stingray/particle.h>
 #include <stingray/pworld.h>
 
 #include <utils/cylinder.h>
+#include <utils/mesh.h>
 #include <utils/shader.h>
 #include <utils/sphere.h>
 
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <imgui.h>
+
 #include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+bool show = true;
 
 stingray::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
@@ -130,6 +136,10 @@ void processInput(GLFWwindow *window) {
     glfwSetWindowShouldClose(window, true);
   }
 
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+  }
+
   const float cameraSpeed = 3.5f * deltaTime;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     cameraPos += cameraSpeed * cameraFront;
@@ -194,7 +204,6 @@ int main(void) {
 
   glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
   glCullFace(GL_BACK);
   // glEnable(GL_CULL_FACE);
@@ -222,30 +231,58 @@ int main(void) {
   b.particle.damping = 0.99f;
   b.particle.setAcceleration(GRAVITY);
 
-  r.particle.setPosition(0.0, cylinder.getHeight() * 1.5, 0.0);
+  r.particle.setPosition(0.0, cylinder.getHeight(), 0.0);
   r.particle.setInverseMass(0);
   r.particle.damping = 0.99f;
+
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO &io = ImGui::GetIO();
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+
+  ImGui_ImplOpenGL3_Init();
 
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    shader.use();
     processInput(window);
-    world.startFrame();
-
-    glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    renderScene(shader);
 
     world.runPhysics(1.0 / 60.0);
+    world.startFrame();
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    ImGui::ShowDemoWindow(&show);
+
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_SCISSOR_TEST);
+    glDisable(GL_BLEND);
+    glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    shader.use();
+    renderScene(shader);
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     fprintf(stderr, "dist=%f\n",
             (b.particle.getPosition() - r.particle.getPosition()).magnitude());
+
     glfwSwapBuffers(window);
     glfwWaitEventsTimeout(1.0 / 60.0);
   }
 
   glfwTerminate();
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
+
   return 0;
 }
