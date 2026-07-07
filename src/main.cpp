@@ -162,14 +162,14 @@ void processInput(GLFWwindow *window) {
     cameraPos -= 2.0f * cameraSpeed * cameraUp;
   }
 }
-void renderScene(utils::Shader shader) {
+void renderScene(utils::Shader shader, int fbWidth, int fbHeight) {
   glm::mat4 model = glm::mat4(1.0f);
 
   glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
   glm::mat4 projection = glm::mat4(1.0f);
-  projection = glm::perspective(
-      (glm::radians(fov)), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+  projection = glm::perspective((glm::radians(fov)),
+                                (float)fbWidth / (float)fbHeight, 0.1f, 100.0f);
 
   unsigned int view_loc = glGetUniformLocation(shader.ID, "view");
   unsigned int projection_loc = glGetUniformLocation(shader.ID, "projection");
@@ -252,28 +252,40 @@ int main(void) {
 
     processInput(window);
 
-    world.runPhysics(1.0 / 60.0);
     world.startFrame();
+    world.runPhysics(1.0 / 60.0);
+
+    // ImGui::ShowDemoWindow(&show);
+
+    int fbWidth, fbHeight;
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    glViewport(0, 0, fbWidth,
+               fbHeight); // <-- reset before scene draw, not just once at init
+    glDisable(GL_SCISSOR_TEST);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
+    glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    int vp[4];
+    glGetIntegerv(GL_VIEWPORT, vp);
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    ImGui::ShowDemoWindow(&show);
-
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_SCISSOR_TEST);
-    glDisable(GL_BLEND);
-    glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    ImGui::Begin("Controls");
+    ImGui::Text("viewport=%d,%d,%d,%d\n", vp[0], vp[1], vp[2], vp[3]);
+    ImGui::Text(
+        "dist=%.3f",
+        (b.particle.getPosition() - r.particle.getPosition()).magnitude());
+    ImGui::End();
 
     shader.use();
-    renderScene(shader);
+    renderScene(shader, fbWidth, fbHeight);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    fprintf(stderr, "dist=%f\n",
-            (b.particle.getPosition() - r.particle.getPosition()).magnitude());
 
     glfwSwapBuffers(window);
     glfwWaitEventsTimeout(1.0 / 60.0);
