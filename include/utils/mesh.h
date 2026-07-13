@@ -22,6 +22,7 @@ public:
   virtual void CalcVboAndEbo();
   virtual int numVertices() { return -1; };
   virtual int numElements() { return -1; };
+  virtual int getVAO() { return VAO; };
 
 private:
   unsigned int VBO = 0;

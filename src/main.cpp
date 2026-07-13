@@ -1,3 +1,4 @@
+#include "glm/geometric.hpp"
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
@@ -7,6 +8,7 @@
 #include <stingray/particle.h>
 #include <stingray/pworld.h>
 
+#include <string>
 #include <utils/cylinder.h>
 #include <utils/mesh.h>
 #include <utils/shader.h>
@@ -21,10 +23,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <vector>
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 bool show = true;
+float initialTheta = glm::radians(45.0f);
 
 stingray::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
@@ -48,11 +52,14 @@ struct Rod {
   stingray::Particle particle;
   stingray::ParticleRod rod;
   void render(glm::mat4 model, GLuint drawMode, int model_loc,
-              utils::Cylinder &cylinder, int vertSize) {
+              utils::Cylinder &cylinder, int vertSize, float theta,
+              glm::vec3 axis) {
     stingray::Vec3 position = particle.getPosition();
-    model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
+
     model =
         glm::translate(model, glm::vec3(position.x, position.y, position.z));
+    model = glm::rotate(model, theta, axis);
+    model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
 
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
     cylinder.RenderVBO(drawMode, 0, vertSize);
@@ -71,6 +78,7 @@ unsigned int vertColorLoc = 1;
 utils::Sphere sphere = utils::Sphere(100, 100);
 utils::Cylinder cylinder = utils::Cylinder(100, 2);
 
+std::vector<std::string> vec;
 unsigned int vertsSize = cylinder.numVertices();
 unsigned int idxSize = sphere.numElements();
 
@@ -178,7 +186,18 @@ void renderScene(utils::Shader shader, int fbWidth, int fbHeight) {
   glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
   glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
 
-  r.render(model, GL_TRIANGLE_STRIP, model_loc, cylinder, vertsSize / 3);
+  stingray::Vec3 dir = r.particle.getPosition() - b.particle.getPosition();
+  dir.normalize();
+  float theta = dir.dotProduct(stingray::Vec3(0, 1, 0));
+  // theta = atan2(dir.x, -dir.y);
+  theta = acosf(theta);
+  std::cout << theta << "\n";
+
+  glm::vec3 axis =
+      -glm::cross(glm::vec3(dir.x, dir.y, dir.z), glm::vec3(0, 1, 0));
+
+  r.render(model, GL_TRIANGLE_STRIP, model_loc, cylinder, vertsSize / 3, theta,
+           axis);
   model = glm::mat4(1.0f);
   b.render(model, GL_TRIANGLES, idxSize, model_loc, sphere);
 }
@@ -226,7 +245,8 @@ int main(void) {
   world.getParticles().push_back(&r.particle);
   world.getContactGenerators().push_back(&r.rod);
 
-  b.particle.setPosition(5.0, 5.0, 0.0);
+  b.particle.setPosition(2.0f * sin(initialTheta), -2.0f * cos(initialTheta),
+                         0);
   b.particle.setMass(1.0f);
   b.particle.damping = 0.99f;
   b.particle.setAcceleration(GRAVITY);
@@ -271,21 +291,39 @@ int main(void) {
     int vp[4];
     glGetIntegerv(GL_VIEWPORT, vp);
 
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    ImGui::Begin("Controls");
-    ImGui::Text("viewport=%d,%d,%d,%d\n", vp[0], vp[1], vp[2], vp[3]);
-    ImGui::Text(
-        "dist=%.3f",
-        (b.particle.getPosition() - r.particle.getPosition()).magnitude());
-    ImGui::End();
+    // ImGui_ImplOpenGL3_NewFrame();
+    // ImGui_ImplGlfw_NewFrame();
+    // ImGui::NewFrame();
+    // ImGui::Begin("Controls");
+    // ImGui::Text("viewport=%d,%d,%d,%d\n", vp[0], vp[1], vp[2], vp[3]);
+    // ImGui::Text(
+    //     "dist=%.3f",
+    //     (b.particle.getPosition() - r.particle.getPosition()).magnitude());
+    // ImGui::End();
+
+    GLint vao;
+    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &vao);
+    // fprintf(stderr, "frame vao=%d\n", vao);
+    GLboolean cullEnabled = glIsEnabled(GL_CULL_FACE);
+    GLboolean depthEnabled = glIsEnabled(GL_DEPTH_TEST);
+    GLint depthFunc, frontFace, polyMode[2];
+    glGetIntegerv(GL_DEPTH_FUNC, &depthFunc);
+    glGetIntegerv(GL_FRONT_FACE, &frontFace);
+    glGetIntegerv(GL_POLYGON_MODE, polyMode);
+    GLboolean depthMask;
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMask);
+
+    // fprintf(stderr,
+    // "cull=%d depth=%d depthFunc=0x%x front=0x%x polyMode=0x%x,0x%x "
+    // "depthMask=%d\n",
+    // cullEnabled, depthEnabled, depthFunc, frontFace, polyMode[0],
+    // polyMode[1], depthMask);
 
     shader.use();
     renderScene(shader, fbWidth, fbHeight);
 
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    // ImGui::Render();
+    // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);
     glfwWaitEventsTimeout(1.0 / 60.0);

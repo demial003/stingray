@@ -1,5 +1,4 @@
-#ifndef CORE_H
-#define CORE_H
+#pragma once
 
 #include <cmath>
 // #include <stingray/precision.h>
@@ -97,5 +96,3 @@ private:
   real pad;
 };
 } // namespace stingray
-
-#endif
