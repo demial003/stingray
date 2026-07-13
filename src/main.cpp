@@ -28,7 +28,7 @@
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 bool show = true;
-float initialTheta = glm::radians(45.0f);
+float initialTheta = glm::radians(60.0f);
 
 stingray::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
@@ -36,12 +36,14 @@ struct Bob {
   stingray::Particle particle;
 
   void render(glm::mat4 model, GLuint drawMode, int idxSize, int model_loc,
-              utils::Sphere &sphere) {
+              utils::Sphere &sphere, float theta, glm::vec3 axis) {
     stingray::Vec3 position;
     particle.getPosition(&position);
 
+    // model = glm::rotate(model, theta, axis);
     model =
         glm::translate(model, glm::vec3(position.x, position.y, position.z));
+    model = glm::scale(model, glm::vec3(0.8f));
 
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
     sphere.RenderEBO(drawMode, idxSize);
@@ -59,7 +61,7 @@ struct Rod {
     model =
         glm::translate(model, glm::vec3(position.x, position.y, position.z));
     model = glm::rotate(model, theta, axis);
-    model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
+    model = glm::scale(model, glm::vec3(0.1f, 1.0f, 0.1f));
 
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
     cylinder.RenderVBO(drawMode, 0, vertSize);
@@ -199,7 +201,7 @@ void renderScene(utils::Shader shader, int fbWidth, int fbHeight) {
   r.render(model, GL_TRIANGLE_STRIP, model_loc, cylinder, vertsSize / 3, theta,
            axis);
   model = glm::mat4(1.0f);
-  b.render(model, GL_TRIANGLES, idxSize, model_loc, sphere);
+  b.render(model, GL_TRIANGLES, idxSize, model_loc, sphere, theta, axis);
 }
 
 int main(void) {
@@ -222,10 +224,10 @@ int main(void) {
   }
 
   glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glDepthFunc(GL_LEQUAL);
   glCullFace(GL_BACK);
-  // glEnable(GL_CULL_FACE);
+  glEnable(GL_CULL_FACE);
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
