@@ -23,6 +23,8 @@ void Mesh::initializeAtrributeLocations(unsigned int posLoc) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, numElems * sizeof(int), 0,
                GL_STATIC_DRAW);
+  if (numElems > 0) {
+  }
   glVertexAttribPointer(vertPosLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
                         (void *)0);
   glEnableVertexAttribArray(vertPosLoc);

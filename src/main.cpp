@@ -192,7 +192,7 @@ void renderScene(utils::Shader shader, int fbWidth, int fbHeight) {
   float theta = dir.dotProduct(stingray::Vec3(0, 1, 0));
   // theta = atan2(dir.x, -dir.y);
   theta = acosf(theta);
-  std::cout << theta << "\n";
+  // std::cout << theta << "\n";
 
   glm::vec3 axis =
       -glm::cross(glm::vec3(dir.x, dir.y, dir.z), glm::vec3(0, 1, 0));
@@ -223,7 +223,7 @@ int main(void) {
   }
 
   glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glDepthFunc(GL_LEQUAL);
   glCullFace(GL_BACK);
   glEnable(GL_CULL_FACE);
