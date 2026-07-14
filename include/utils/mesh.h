@@ -17,11 +17,11 @@ public:
   virtual void initializeAtrributeLocations(unsigned int posLoc);
   virtual void RenderVBO(GLuint drawMode, unsigned int first,
                          unsigned int numVerts);
-  virtual void RenderEBO(GLuint drawMode, unsigned int numElems);
-  virtual void genVertices(float *vboIdx, unsigned int *eboIdx) = 0;
-  virtual void CalcVboAndEbo();
-  virtual int numVertices() { return -1; };
-  virtual int numElements() { return -1; };
+  virtual void RenderEBO(GLuint drawMode, unsigned int numElems) const;
+  virtual void genVertices(float *vboIdx, unsigned int *eboIdx) const = 0;
+  virtual void CalcVboAndEbo() const;
+  virtual int numVertices() const { return -1; };
+  virtual int numElements() const { return -1; };
   virtual int getVAO() { return VAO; };
 
 private:

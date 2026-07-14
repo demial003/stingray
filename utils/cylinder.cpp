@@ -2,7 +2,7 @@
 #include <utils/cylinder.h>
 
 namespace utils {
-void Cylinder::genVertices(float *vboIdx, unsigned int *eboIdx) {
+void Cylinder::genVertices(float *vboIdx, unsigned int *eboIdx) const {
   for (auto j = 0; j <= slices; j++) {
     float phi = (float)(j % slices) / float(slices) * M_PI * 2.0f;
     float x = cos(phi);
@@ -19,6 +19,6 @@ void Cylinder::genVertices(float *vboIdx, unsigned int *eboIdx) {
   }
 }
 
-int Cylinder::numVertices() { return 6 * (slices + 1); }
-int Cylinder::numElements() { return 0; };
+int Cylinder::numVertices() const { return 6 * (slices + 1); }
+int Cylinder::numElements() const { return 0; };
 } // namespace utils

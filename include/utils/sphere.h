@@ -10,15 +10,15 @@ public:
     slices = val1;
     stacks = val2;
   }
-  virtual int numVertices();
-  virtual int numElements();
+  virtual int numVertices() const;
+  virtual int numElements() const;
 
-  virtual void genVertices(float *vboIdx, unsigned int *eboIdx);
+  virtual void genVertices(float *vboIdx, unsigned int *eboIdx) const;
 
 private:
   int slices;
   int stacks;
-  int getVertexNumber(int i, int j);
+  int getVertexNumber(int i, int j) const;
 };
 } // namespace utils
 #endif

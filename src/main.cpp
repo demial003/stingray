@@ -27,19 +27,18 @@
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 bool show = true;
-float initialTheta = glm::radians(60.0f);
+float initialTheta = glm::radians(100.0f);
 
 stingray::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
 struct Bob {
   stingray::Particle particle;
 
-  void render(glm::mat4 model, GLuint drawMode, int idxSize, int model_loc,
-              utils::Sphere &sphere) {
+  void render(glm::mat4 &model, GLenum drawMode, int idxSize, int model_loc,
+              const utils::Sphere &sphere) {
     stingray::Vec3 position;
     particle.getPosition(&position);
 
-    // model = glm::rotate(model, theta, axis);
     model =
         glm::translate(model, glm::vec3(position.x, position.y, position.z));
     model = glm::scale(model, glm::vec3(0.8f));
@@ -52,7 +51,7 @@ struct Bob {
 struct Rod {
   stingray::Particle particle;
   stingray::ParticleRod rod;
-  void render(glm::mat4 model, GLuint drawMode, int model_loc,
+  void render(glm::mat4 &model, GLenum drawMode, int model_loc,
               utils::Cylinder &cylinder, int vertSize, float theta,
               glm::vec3 axis) {
     stingray::Vec3 position = particle.getPosition();
@@ -223,7 +222,7 @@ int main(void) {
   }
 
   glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glDepthFunc(GL_LEQUAL);
   glCullFace(GL_BACK);
   glEnable(GL_CULL_FACE);
@@ -246,8 +245,9 @@ int main(void) {
   world.getParticles().push_back(&r.particle);
   world.getContactGenerators().push_back(&r.rod);
 
-  b.particle.setPosition(2.0f * sin(initialTheta), -2.0f * cos(initialTheta),
-                         0);
+  b.particle.setPosition(
+      cylinder.getHeight() * sinf(initialTheta),
+      cylinder.getHeight() + -cylinder.getHeight() * cosf(initialTheta), 0.0f);
   b.particle.setMass(1.0f);
   b.particle.damping = 0.99f;
   b.particle.setAcceleration(GRAVITY);

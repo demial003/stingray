@@ -32,7 +32,7 @@ void Mesh::initializeAtrributeLocations(unsigned int posLoc) {
   CalcVboAndEbo();
 }
 
-void Mesh::CalcVboAndEbo() {
+void Mesh::CalcVboAndEbo() const {
 
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -57,7 +57,7 @@ void Mesh::RenderVBO(GLuint drawMode, unsigned int first,
   glDrawArrays(drawMode, first, numVerts);
 }
 
-void Mesh::RenderEBO(GLuint drawMode, unsigned int numElems) {
+void Mesh::RenderEBO(GLuint drawMode, unsigned int numElems) const {
   glBindVertexArray(VAO);
   // glVertexAttrib3f(vertColorLoc, 0.5f, 0.35f, 0.0f);
   glDrawElements(drawMode, numElems, GL_UNSIGNED_INT, 0);
