@@ -20,5 +20,5 @@ void Cylinder::genVertices(float *vboIdx, unsigned int *eboIdx) {
 }
 
 int Cylinder::numVertices() { return 6 * (slices + 1); }
-int Cylidner::numElems() { return 0; };
+int Cylinder::numElements() { return 0; };
 } // namespace utils
