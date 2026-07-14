@@ -1,104 +1,104 @@
 [
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -o CMakeFiles/imgui.dir/external/imgui/imgui.cpp.o -c /Users/demialao/projects/stingray/external/imgui/imgui.cpp",
-  "file": "/Users/demialao/projects/stingray/external/imgui/imgui.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -o CMakeFiles/imgui.dir/external/imgui/imgui.cpp.o -c /home/demi/projects/stingray/external/imgui/imgui.cpp",
+  "file": "/home/demi/projects/stingray/external/imgui/imgui.cpp",
   "output": "CMakeFiles/imgui.dir/external/imgui/imgui.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -o CMakeFiles/imgui.dir/external/imgui/imgui_demo.cpp.o -c /Users/demialao/projects/stingray/external/imgui/imgui_demo.cpp",
-  "file": "/Users/demialao/projects/stingray/external/imgui/imgui_demo.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -o CMakeFiles/imgui.dir/external/imgui/imgui_demo.cpp.o -c /home/demi/projects/stingray/external/imgui/imgui_demo.cpp",
+  "file": "/home/demi/projects/stingray/external/imgui/imgui_demo.cpp",
   "output": "CMakeFiles/imgui.dir/external/imgui/imgui_demo.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -o CMakeFiles/imgui.dir/external/imgui/imgui_draw.cpp.o -c /Users/demialao/projects/stingray/external/imgui/imgui_draw.cpp",
-  "file": "/Users/demialao/projects/stingray/external/imgui/imgui_draw.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -o CMakeFiles/imgui.dir/external/imgui/imgui_draw.cpp.o -c /home/demi/projects/stingray/external/imgui/imgui_draw.cpp",
+  "file": "/home/demi/projects/stingray/external/imgui/imgui_draw.cpp",
   "output": "CMakeFiles/imgui.dir/external/imgui/imgui_draw.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -o CMakeFiles/imgui.dir/external/imgui/imgui_tables.cpp.o -c /Users/demialao/projects/stingray/external/imgui/imgui_tables.cpp",
-  "file": "/Users/demialao/projects/stingray/external/imgui/imgui_tables.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -o CMakeFiles/imgui.dir/external/imgui/imgui_tables.cpp.o -c /home/demi/projects/stingray/external/imgui/imgui_tables.cpp",
+  "file": "/home/demi/projects/stingray/external/imgui/imgui_tables.cpp",
   "output": "CMakeFiles/imgui.dir/external/imgui/imgui_tables.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -o CMakeFiles/imgui.dir/external/imgui/imgui_widgets.cpp.o -c /Users/demialao/projects/stingray/external/imgui/imgui_widgets.cpp",
-  "file": "/Users/demialao/projects/stingray/external/imgui/imgui_widgets.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -o CMakeFiles/imgui.dir/external/imgui/imgui_widgets.cpp.o -c /home/demi/projects/stingray/external/imgui/imgui_widgets.cpp",
+  "file": "/home/demi/projects/stingray/external/imgui/imgui_widgets.cpp",
   "output": "CMakeFiles/imgui.dir/external/imgui/imgui_widgets.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -o CMakeFiles/imgui.dir/external/imgui/backends/imgui_impl_glfw.cpp.o -c /Users/demialao/projects/stingray/external/imgui/backends/imgui_impl_glfw.cpp",
-  "file": "/Users/demialao/projects/stingray/external/imgui/backends/imgui_impl_glfw.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -o CMakeFiles/imgui.dir/external/imgui/backends/imgui_impl_glfw.cpp.o -c /home/demi/projects/stingray/external/imgui/backends/imgui_impl_glfw.cpp",
+  "file": "/home/demi/projects/stingray/external/imgui/backends/imgui_impl_glfw.cpp",
   "output": "CMakeFiles/imgui.dir/external/imgui/backends/imgui_impl_glfw.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -o CMakeFiles/imgui.dir/external/imgui/backends/imgui_impl_opengl3.cpp.o -c /Users/demialao/projects/stingray/external/imgui/backends/imgui_impl_opengl3.cpp",
-  "file": "/Users/demialao/projects/stingray/external/imgui/backends/imgui_impl_opengl3.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -o CMakeFiles/imgui.dir/external/imgui/backends/imgui_impl_opengl3.cpp.o -c /home/demi/projects/stingray/external/imgui/backends/imgui_impl_opengl3.cpp",
+  "file": "/home/demi/projects/stingray/external/imgui/backends/imgui_impl_opengl3.cpp",
   "output": "CMakeFiles/imgui.dir/external/imgui/backends/imgui_impl_opengl3.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -Wall -Wextra -o CMakeFiles/stingray.dir/src/main.cpp.o -c /Users/demialao/projects/stingray/src/main.cpp",
-  "file": "/Users/demialao/projects/stingray/src/main.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -Wall -Wextra -o CMakeFiles/stingray.dir/src/main.cpp.o -c /home/demi/projects/stingray/src/main.cpp",
+  "file": "/home/demi/projects/stingray/src/main.cpp",
   "output": "CMakeFiles/stingray.dir/src/main.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -Wall -Wextra -o CMakeFiles/stingray.dir/utils/sphere.cpp.o -c /Users/demialao/projects/stingray/utils/sphere.cpp",
-  "file": "/Users/demialao/projects/stingray/utils/sphere.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -Wall -Wextra -o CMakeFiles/stingray.dir/utils/sphere.cpp.o -c /home/demi/projects/stingray/utils/sphere.cpp",
+  "file": "/home/demi/projects/stingray/utils/sphere.cpp",
   "output": "CMakeFiles/stingray.dir/utils/sphere.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/cc  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -arch arm64 -Wall -Wextra -o CMakeFiles/stingray.dir/utils/glad.c.o -c /Users/demialao/projects/stingray/utils/glad.c",
-  "file": "/Users/demialao/projects/stingray/utils/glad.c",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/cc  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -Wall -Wextra -o CMakeFiles/stingray.dir/utils/glad.c.o -c /home/demi/projects/stingray/utils/glad.c",
+  "file": "/home/demi/projects/stingray/utils/glad.c",
   "output": "CMakeFiles/stingray.dir/utils/glad.c.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -Wall -Wextra -o CMakeFiles/stingray.dir/utils/cylinder.cpp.o -c /Users/demialao/projects/stingray/utils/cylinder.cpp",
-  "file": "/Users/demialao/projects/stingray/utils/cylinder.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -Wall -Wextra -o CMakeFiles/stingray.dir/utils/cylinder.cpp.o -c /home/demi/projects/stingray/utils/cylinder.cpp",
+  "file": "/home/demi/projects/stingray/utils/cylinder.cpp",
   "output": "CMakeFiles/stingray.dir/utils/cylinder.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -Wall -Wextra -o CMakeFiles/stingray.dir/utils/mesh.cpp.o -c /Users/demialao/projects/stingray/utils/mesh.cpp",
-  "file": "/Users/demialao/projects/stingray/utils/mesh.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -Wall -Wextra -o CMakeFiles/stingray.dir/utils/mesh.cpp.o -c /home/demi/projects/stingray/utils/mesh.cpp",
+  "file": "/home/demi/projects/stingray/utils/mesh.cpp",
   "output": "CMakeFiles/stingray.dir/utils/mesh.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -Wall -Wextra -o CMakeFiles/stingray.dir/src/particle.cpp.o -c /Users/demialao/projects/stingray/src/particle.cpp",
-  "file": "/Users/demialao/projects/stingray/src/particle.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -Wall -Wextra -o CMakeFiles/stingray.dir/src/particle.cpp.o -c /home/demi/projects/stingray/src/particle.cpp",
+  "file": "/home/demi/projects/stingray/src/particle.cpp",
   "output": "CMakeFiles/stingray.dir/src/particle.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -Wall -Wextra -o CMakeFiles/stingray.dir/src/pcontacts.cpp.o -c /Users/demialao/projects/stingray/src/pcontacts.cpp",
-  "file": "/Users/demialao/projects/stingray/src/pcontacts.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -Wall -Wextra -o CMakeFiles/stingray.dir/src/pcontacts.cpp.o -c /home/demi/projects/stingray/src/pcontacts.cpp",
+  "file": "/home/demi/projects/stingray/src/pcontacts.cpp",
   "output": "CMakeFiles/stingray.dir/src/pcontacts.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -Wall -Wextra -o CMakeFiles/stingray.dir/src/pfgen.cpp.o -c /Users/demialao/projects/stingray/src/pfgen.cpp",
-  "file": "/Users/demialao/projects/stingray/src/pfgen.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -Wall -Wextra -o CMakeFiles/stingray.dir/src/pfgen.cpp.o -c /home/demi/projects/stingray/src/pfgen.cpp",
+  "file": "/home/demi/projects/stingray/src/pfgen.cpp",
   "output": "CMakeFiles/stingray.dir/src/pfgen.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -Wall -Wextra -o CMakeFiles/stingray.dir/src/pworld.cpp.o -c /Users/demialao/projects/stingray/src/pworld.cpp",
-  "file": "/Users/demialao/projects/stingray/src/pworld.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -Wall -Wextra -o CMakeFiles/stingray.dir/src/pworld.cpp.o -c /home/demi/projects/stingray/src/pworld.cpp",
+  "file": "/home/demi/projects/stingray/src/pworld.cpp",
   "output": "CMakeFiles/stingray.dir/src/pworld.cpp.o"
 },
 {
-  "directory": "/Users/demialao/projects/stingray/build",
-  "command": "/usr/bin/c++  -I/Users/demialao/projects/stingray/include -I/Users/demialao/projects/stingray/external/imgui -I/Users/demialao/projects/stingray/external/imgui/backends -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -g -std=gnu++17 -arch arm64 -Wall -Wextra -o CMakeFiles/stingray.dir/src/plinks.cpp.o -c /Users/demialao/projects/stingray/src/plinks.cpp",
-  "file": "/Users/demialao/projects/stingray/src/plinks.cpp",
+  "directory": "/home/demi/projects/stingray/build",
+  "command": "/usr/bin/c++  -I/home/demi/projects/stingray/include -I/home/demi/projects/stingray/external/imgui -I/home/demi/projects/stingray/external/imgui/backends -g -std=gnu++17 -Wall -Wextra -o CMakeFiles/stingray.dir/src/plinks.cpp.o -c /home/demi/projects/stingray/src/plinks.cpp",
+  "file": "/home/demi/projects/stingray/src/plinks.cpp",
   "output": "CMakeFiles/stingray.dir/src/plinks.cpp.o"
 }
 ]

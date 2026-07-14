@@ -1,4 +1,3 @@
-#include "glm/geometric.hpp"
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
@@ -36,7 +35,7 @@ struct Bob {
   stingray::Particle particle;
 
   void render(glm::mat4 model, GLuint drawMode, int idxSize, int model_loc,
-              utils::Sphere &sphere, float theta, glm::vec3 axis) {
+              utils::Sphere &sphere) {
     stingray::Vec3 position;
     particle.getPosition(&position);
 
@@ -193,7 +192,7 @@ void renderScene(utils::Shader shader, int fbWidth, int fbHeight) {
   float theta = dir.dotProduct(stingray::Vec3(0, 1, 0));
   // theta = atan2(dir.x, -dir.y);
   theta = acosf(theta);
-  std::cout << theta << "\n";
+  // std::cout << theta << "\n";
 
   glm::vec3 axis =
       -glm::cross(glm::vec3(dir.x, dir.y, dir.z), glm::vec3(0, 1, 0));
@@ -201,7 +200,7 @@ void renderScene(utils::Shader shader, int fbWidth, int fbHeight) {
   r.render(model, GL_TRIANGLE_STRIP, model_loc, cylinder, vertsSize / 3, theta,
            axis);
   model = glm::mat4(1.0f);
-  b.render(model, GL_TRIANGLES, idxSize, model_loc, sphere, theta, axis);
+  b.render(model, GL_TRIANGLES, idxSize, model_loc, sphere);
 }
 
 int main(void) {
@@ -224,7 +223,7 @@ int main(void) {
   }
 
   glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glDepthFunc(GL_LEQUAL);
   glCullFace(GL_BACK);
   glEnable(GL_CULL_FACE);
