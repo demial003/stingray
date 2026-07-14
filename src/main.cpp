@@ -331,10 +331,10 @@ int main(void) {
     glfwWaitEventsTimeout(1.0 / 60.0);
   }
 
-  glfwTerminate();
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
+  glfwTerminate();
 
   return 0;
 }
