@@ -35,7 +35,7 @@ struct Bob {
   stingray::Particle particle;
 
   void render(glm::mat4 model, GLuint drawMode, int idxSize, int model_loc,
-              utils::Sphere &sphere, float theta, glm::vec3 axis) {
+              utils::Sphere &sphere) {
     stingray::Vec3 position;
     particle.getPosition(&position);
 
@@ -200,7 +200,7 @@ void renderScene(utils::Shader shader, int fbWidth, int fbHeight) {
   r.render(model, GL_TRIANGLE_STRIP, model_loc, cylinder, vertsSize / 3, theta,
            axis);
   model = glm::mat4(1.0f);
-  b.render(model, GL_TRIANGLES, idxSize, model_loc, sphere, theta, axis);
+  b.render(model, GL_TRIANGLES, idxSize, model_loc, sphere);
 }
 
 int main(void) {
@@ -330,10 +330,10 @@ int main(void) {
     glfwWaitEventsTimeout(1.0 / 60.0);
   }
 
-  glfwTerminate();
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
+  glfwTerminate();
 
   return 0;
 }
