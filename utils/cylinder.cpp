@@ -8,17 +8,31 @@ void Cylinder::genVertices(float *vboIdx, unsigned int *eboIdx) const {
     float x = cos(phi);
     float z = sin(phi);
 
-    float *basePtr = vboIdx + j * 6;
-    *(basePtr) = x;
-    *(basePtr + 1) = (float)height / 1.0f;
-    *(basePtr + 2) = z;
+    float *basePtr = vboIdx + j * 16;
+    *(basePtr++) = x;
+    *(basePtr++) = (float)height;
+    *(basePtr++) = z;
 
-    *(basePtr + 3) = x;
-    *(basePtr + 4) = -(float)height / 1.0f;
-    *(basePtr + 5) = z;
+    *(basePtr++) = x;
+    *(basePtr++) = 0;
+    *(basePtr++) = z;
+
+    *(basePtr++) = (float)j / float(slices);
+    *(basePtr++) = height;
+
+    *(basePtr++) = x;
+    *(basePtr++) = -(float)height;
+    *(basePtr++) = z;
+
+    *(basePtr++) = x;
+    *(basePtr++) = 0;
+    *(basePtr++) = z;
+
+    *(basePtr++) = (float)(j % slices) / float(slices);
+    *(basePtr++) = -height;
   }
 }
 
-int Cylinder::numVertices() const { return 6 * (slices + 1); }
+int Cylinder::numVertices() const { return 16 * (slices + 1); }
 int Cylinder::numElements() const { return 0; };
 } // namespace utils

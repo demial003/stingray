@@ -34,8 +34,8 @@ stingray::Vec3 GRAVITY(0.0, -9.81, 0.0);
 struct Bob {
   stingray::Particle particle;
 
-  void render(glm::mat4 &model, GLenum drawMode, int idxSize, int model_loc,
-              const utils::Sphere &sphere) {
+  void render(glm::mat4 &model, GLenum drawMode, int idxSize,
+              utils::Shader &shader, const utils::Sphere &sphere) {
     stingray::Vec3 position;
     particle.getPosition(&position);
 
@@ -43,7 +43,7 @@ struct Bob {
         glm::translate(model, glm::vec3(position.x, position.y, position.z));
     model = glm::scale(model, glm::vec3(0.8f));
 
-    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+    shader.setMat4("model", model);
     sphere.RenderEBO(drawMode, idxSize);
   }
 };
@@ -51,7 +51,7 @@ struct Bob {
 struct Rod {
   stingray::Particle particle;
   stingray::ParticleRod rod;
-  void render(glm::mat4 &model, GLenum drawMode, int model_loc,
+  void render(glm::mat4 &model, GLenum drawMode, utils::Shader &shader,
               utils::Cylinder &cylinder, int vertSize, float theta,
               glm::vec3 axis) {
     stingray::Vec3 position = particle.getPosition();
@@ -61,7 +61,7 @@ struct Rod {
     model = glm::rotate(model, theta, axis);
     model = glm::scale(model, glm::vec3(0.1f, 1.0f, 0.1f));
 
-    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+    shader.setMat4("model", model);
     cylinder.RenderVBO(drawMode, 0, vertSize);
   }
 };
@@ -73,7 +73,8 @@ const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 900;
 
 unsigned int vertPosLoc = 0;
-unsigned int vertColorLoc = 1;
+unsigned int vertNormLoc = 1;
+unsigned int vertTexLoc = 2;
 
 utils::Sphere sphere = utils::Sphere(100, 100);
 utils::Cylinder cylinder = utils::Cylinder(100, 2);
@@ -178,13 +179,8 @@ void renderScene(utils::Shader shader, int fbWidth, int fbHeight) {
   glm::mat4 projection = glm::mat4(1.0f);
   projection = glm::perspective((glm::radians(fov)),
                                 (float)fbWidth / (float)fbHeight, 0.1f, 100.0f);
-
-  unsigned int view_loc = glGetUniformLocation(shader.ID, "view");
-  unsigned int projection_loc = glGetUniformLocation(shader.ID, "projection");
-  unsigned int model_loc = glGetUniformLocation(shader.ID, "model");
-
-  glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
+  shader.setMat4("view", view);
+  shader.setMat4("projection", projection);
 
   stingray::Vec3 dir = r.particle.getPosition() - b.particle.getPosition();
   dir.normalize();
@@ -196,10 +192,10 @@ void renderScene(utils::Shader shader, int fbWidth, int fbHeight) {
   glm::vec3 axis =
       -glm::cross(glm::vec3(dir.x, dir.y, dir.z), glm::vec3(0, 1, 0));
 
-  r.render(model, GL_TRIANGLE_STRIP, model_loc, cylinder, vertsSize / 3, theta,
+  r.render(model, GL_TRIANGLE_STRIP, shader, cylinder, vertsSize / 8, theta,
            axis);
   model = glm::mat4(1.0f);
-  b.render(model, GL_TRIANGLES, idxSize, model_loc, sphere);
+  b.render(model, GL_TRIANGLES, idxSize, shader, sphere);
 }
 
 int main(void) {
@@ -232,9 +228,9 @@ int main(void) {
   glfwSetScrollCallback(window, scroll_callback);
   glfwSetCursorPosCallback(window, mouse_callback);
 
-  cylinder.initializeAtrributeLocations(vertPosLoc);
-  sphere.initializeAtrributeLocations(vertPosLoc);
-  utils::Shader shader("../shaders/shader.vs", "../shaders/shader.fs");
+  cylinder.initializeAtrributeLocations(vertPosLoc, vertNormLoc, vertTexLoc);
+  sphere.initializeAtrributeLocations(vertPosLoc, vertNormLoc, vertTexLoc);
+  utils::Shader shader("../shaders/shader.vert", "../shaders/shader.frag");
 
   stingray::ParticleWorld world(2, 4);
   r.rod.particle[0] = &r.particle;
@@ -286,7 +282,7 @@ int main(void) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     int vp[4];
@@ -321,6 +317,13 @@ int main(void) {
     // polyMode[1], depthMask);
 
     shader.use();
+    shader.setVec3("viewPos", cameraPos);
+    shader.setFloat("material.shininess", 32.0f);
+
+    shader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+    shader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+    shader.setVec3("dirLight.diffuse", 0.05f, 0.5f, 0.5f);
+    shader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
     renderScene(shader, fbWidth, fbHeight);
 
     // ImGui::Render();

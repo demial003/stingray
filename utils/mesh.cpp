@@ -4,7 +4,9 @@
 
 using namespace utils;
 
-void Mesh::initializeAtrributeLocations(unsigned int posLoc) {
+void Mesh::initializeAtrributeLocations(unsigned int posLoc,
+                                        unsigned int normLoc,
+                                        unsigned int texLoc) {
 
   if (VAO == 0) {
     glGenVertexArrays(1, &VAO);
@@ -15,6 +17,8 @@ void Mesh::initializeAtrributeLocations(unsigned int posLoc) {
   int numVerts = numVertices();
   int numElems = numElements();
   vertPosLoc = posLoc;
+  vertNormLoc = normLoc;
+  vertTexLoc = texLoc;
 
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -23,11 +27,17 @@ void Mesh::initializeAtrributeLocations(unsigned int posLoc) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, numElems * sizeof(int), 0,
                GL_STATIC_DRAW);
-  if (numElems > 0) {
-  }
-  glVertexAttribPointer(vertPosLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+
+  glVertexAttribPointer(vertPosLoc, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
                         (void *)0);
   glEnableVertexAttribArray(vertPosLoc);
+
+  glVertexAttribPointer(vertNormLoc, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                        (void *)(3 * sizeof(float)));
+  glEnableVertexAttribArray(vertNormLoc);
+  glVertexAttribPointer(vertTexLoc, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                        (void *)(6 * sizeof(float)));
+  glEnableVertexAttribArray(vertTexLoc);
 
   CalcVboAndEbo();
 }
@@ -53,13 +63,11 @@ void Mesh::CalcVboAndEbo() const {
 void Mesh::RenderVBO(GLuint drawMode, unsigned int first,
                      unsigned int numVerts) {
   glBindVertexArray(VAO);
-  // glVertexAttrib3f(vertColorLoc, 0.5f, 0.35f, 0.0f);
   glDrawArrays(drawMode, first, numVerts);
 }
 
 void Mesh::RenderEBO(GLuint drawMode, unsigned int numElems) const {
   glBindVertexArray(VAO);
-  // glVertexAttrib3f(vertColorLoc, 0.5f, 0.35f, 0.0f);
   glDrawElements(drawMode, numElems, GL_UNSIGNED_INT, 0);
 }
 

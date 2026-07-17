@@ -18,10 +18,17 @@ void Sphere::genVertices(float *vboIdx, unsigned int *eboIdx) const {
 
       int vertNumber = getVertexNumber(i, j);
 
-      float *basePtr = vboIdx + vertNumber * 3;
-      *(basePtr) = x;
-      *(basePtr + 1) = y;
-      *(basePtr + 2) = z;
+      float *basePtr = vboIdx + vertNumber * 8;
+      *(basePtr++) = x;
+      *(basePtr++) = y;
+      *(basePtr++) = z;
+
+      *(basePtr++) = x;
+      *(basePtr++) = y;
+      *(basePtr++) = z;
+
+      *(basePtr++) = float(i % slices) / (float)slices;
+      *(basePtr++) = (float)j / (float)stacks;
     }
   }
 
@@ -60,6 +67,6 @@ int Sphere::getVertexNumber(int i, int j) const {
   }
 }
 
-int Sphere::numVertices() const { return 3 * (slices * (stacks - 1) + 2); }
+int Sphere::numVertices() const { return 8 * (slices * (stacks - 1) + 2); }
 int Sphere::numElements() const { return 6 * slices * (stacks - 1); }
 } // namespace utils
