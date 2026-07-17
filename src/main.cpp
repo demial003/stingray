@@ -31,15 +31,15 @@ stingray::Vec3 GRAVITY(0.0, -9.81, 0.0);
 struct Bob {
   stingray::Particle particle;
 
-  void render(glm::mat4 model, GLuint drawMode, int idxSize, int model_loc,
-              utils::Sphere &sphere) {
+  void render(glm::mat4 model, GLuint drawMode, int idxSize,
+              utils::Sphere &sphere, const utils::Shader &shader) {
     stingray::Vec3 position;
     particle.getPosition(&position);
 
     model =
         glm::translate(model, glm::vec3(position.x, position.y, position.z));
 
-    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+    shader.setMat4("model", model);
     sphere.RenderEBO(drawMode, idxSize);
   }
 };
@@ -47,14 +47,14 @@ struct Bob {
 struct Rod {
   stingray::Particle particle;
   stingray::ParticleRod rod;
-  void render(glm::mat4 model, GLuint drawMode, int model_loc,
-              utils::Cylinder &cylinder, int vertSize) {
+  void render(glm::mat4 model, GLuint drawMode, utils::Cylinder &cylinder,
+              utils::Shader &shader, int vertSize) {
     stingray::Vec3 position = particle.getPosition();
     model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
     model =
         glm::translate(model, glm::vec3(position.x, position.y, position.z));
 
-    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+    shader.setMat4("model", model);
     cylinder.RenderVBO(drawMode, 0, vertSize);
   }
 };
@@ -171,16 +171,12 @@ void renderScene(utils::Shader shader, int fbWidth, int fbHeight) {
   projection = glm::perspective((glm::radians(fov)),
                                 (float)fbWidth / (float)fbHeight, 0.1f, 100.0f);
 
-  unsigned int view_loc = glGetUniformLocation(shader.ID, "view");
-  unsigned int projection_loc = glGetUniformLocation(shader.ID, "projection");
-  unsigned int model_loc = glGetUniformLocation(shader.ID, "model");
+  shader.setMat4("projection", projection);
+  shader.setMat4("view", view);
 
-  glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
-
-  r.render(model, GL_TRIANGLE_STRIP, model_loc, cylinder, vertsSize / 3);
+  r.render(model, GL_TRIANGLE_STRIP, cylinder, shader, vertsSize / 3);
   model = glm::mat4(1.0f);
-  b.render(model, GL_TRIANGLES, idxSize, model_loc, sphere);
+  b.render(model, GL_TRIANGLES, idxSize, sphere, shader);
 }
 
 int main(void) {
