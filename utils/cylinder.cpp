@@ -10,17 +10,6 @@ void Cylinder::genVertices(float *vboIdx, unsigned int *eboIdx) const {
 
     float *basePtr = vboIdx + j * 16;
     *(basePtr++) = x;
-    *(basePtr++) = (float)height;
-    *(basePtr++) = z;
-
-    *(basePtr++) = x;
-    *(basePtr++) = 0;
-    *(basePtr++) = z;
-
-    *(basePtr++) = (float)j / float(slices);
-    *(basePtr++) = height;
-
-    *(basePtr++) = x;
     *(basePtr++) = -(float)height;
     *(basePtr++) = z;
 
@@ -28,8 +17,19 @@ void Cylinder::genVertices(float *vboIdx, unsigned int *eboIdx) const {
     *(basePtr++) = 0;
     *(basePtr++) = z;
 
-    *(basePtr++) = (float)(j % slices) / float(slices);
+    *(basePtr++) = (float)j / float(slices);
     *(basePtr++) = -height;
+
+    *(basePtr++) = x;
+    *(basePtr++) = 0;
+    *(basePtr++) = z;
+
+    *(basePtr++) = x;
+    *(basePtr++) = 0;
+    *(basePtr++) = z;
+
+    *(basePtr++) = (float)j / float(slices);
+    *(basePtr++) = 0;
   }
 }
 

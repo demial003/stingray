@@ -29,41 +29,19 @@ float lastFrame = 0.0f;
 bool show = true;
 float initialTheta = glm::radians(100.0f);
 
+utils::Sphere sphere = utils::Sphere(100, 100);
+utils::Cylinder cylinder = utils::Cylinder(100, 5);
+utils::Sphere lightSphere(10, 10);
+
 stingray::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
 struct Bob {
   stingray::Particle particle;
-
-  void render(glm::mat4 &model, GLenum drawMode, int idxSize,
-              utils::Shader &shader, const utils::Sphere &sphere) {
-    stingray::Vec3 position;
-    particle.getPosition(&position);
-
-    model =
-        glm::translate(model, glm::vec3(position.x, position.y, position.z));
-    model = glm::scale(model, glm::vec3(0.8f));
-
-    shader.setMat4("model", model);
-    sphere.RenderEBO(drawMode, idxSize);
-  }
 };
 
 struct Rod {
   stingray::Particle particle;
   stingray::ParticleRod rod;
-  void render(glm::mat4 &model, GLenum drawMode, utils::Shader &shader,
-              utils::Cylinder &cylinder, int vertSize, float theta,
-              glm::vec3 axis) {
-    stingray::Vec3 position = particle.getPosition();
-
-    model =
-        glm::translate(model, glm::vec3(position.x, position.y, position.z));
-    model = glm::rotate(model, theta, axis);
-    model = glm::scale(model, glm::vec3(0.1f, 1.0f, 0.1f));
-
-    shader.setMat4("model", model);
-    cylinder.RenderVBO(drawMode, 0, vertSize);
-  }
 };
 
 Bob b;
@@ -76,14 +54,11 @@ unsigned int vertPosLoc = 0;
 unsigned int vertNormLoc = 1;
 unsigned int vertTexLoc = 2;
 
-utils::Sphere sphere = utils::Sphere(100, 100);
-utils::Cylinder cylinder = utils::Cylinder(100, 2);
-
 std::vector<std::string> vec;
 unsigned int vertsSize = cylinder.numVertices();
 unsigned int idxSize = sphere.numElements();
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 30.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 20.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -95,6 +70,36 @@ float lastY = 300;
 
 bool firstMouse = true;
 float fov = 45.0f;
+
+void drawBob(stingray::Vec3 position, utils::Shader &shader, GLenum drawMode) {
+  glm::mat4 model(1.0f);
+  model = glm::translate(model, glm::vec3(position.x, position.y, position.z));
+  model = glm::scale(model, glm::vec3(0.8f));
+
+  shader.setMat4("model", model);
+  sphere.RenderEBO(drawMode, idxSize);
+}
+
+void drawRod(stingray::Vec3 rPos, stingray::Vec3 bPos, utils::Shader &shader,
+             GLenum drawMode) {
+  stingray::Vec3 dir = rPos - bPos;
+  dir.normalize();
+  float theta = dir.dotProduct(stingray::Vec3(0, 1, 0));
+  theta = acosf(theta);
+
+  glm::vec3 axis =
+      -glm::cross(glm::vec3(dir.x, dir.y, dir.z), glm::vec3(0, 1, 0));
+
+  glm::mat4 model(1.0f);
+  model = glm::translate(model, glm::vec3(rPos.x, rPos.y, rPos.z));
+  if (glm::length(axis) > 1e-6f) {
+    model = glm::rotate(model, theta, axis);
+  }
+  model = glm::scale(model, glm::vec3(0.1f, 1.0f, 0.1f));
+
+  shader.setMat4("model", model);
+  cylinder.RenderVBO(drawMode, 0, vertsSize);
+}
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   if (!glfwWindowShouldClose(window)) {
@@ -132,7 +137,7 @@ void mouse_callback(GLFWwindow *window, double xPos, double yPos) {
   if (pitch > 89.0f)
     pitch = 89.0f;
   if (pitch < -89.0f)
-    pitch = -89.9f;
+    pitch = -89.0f;
 
   glm::vec3 direction;
   direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
@@ -171,7 +176,7 @@ void processInput(GLFWwindow *window) {
     cameraPos -= 2.0f * cameraSpeed * cameraUp;
   }
 }
-void renderScene(utils::Shader shader, int fbWidth, int fbHeight) {
+void renderScene(utils::Shader &shader, int fbWidth, int fbHeight) {
   glm::mat4 model = glm::mat4(1.0f);
 
   glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -182,20 +187,9 @@ void renderScene(utils::Shader shader, int fbWidth, int fbHeight) {
   shader.setMat4("view", view);
   shader.setMat4("projection", projection);
 
-  stingray::Vec3 dir = r.particle.getPosition() - b.particle.getPosition();
-  dir.normalize();
-  float theta = dir.dotProduct(stingray::Vec3(0, 1, 0));
-  // theta = atan2(dir.x, -dir.y);
-  theta = acosf(theta);
-  // std::cout << theta << "\n";
-
-  glm::vec3 axis =
-      -glm::cross(glm::vec3(dir.x, dir.y, dir.z), glm::vec3(0, 1, 0));
-
-  r.render(model, GL_TRIANGLE_STRIP, shader, cylinder, vertsSize / 8, theta,
-           axis);
-  model = glm::mat4(1.0f);
-  b.render(model, GL_TRIANGLES, idxSize, shader, sphere);
+  drawRod(r.particle.getPosition(), b.particle.getPosition(), shader,
+          GL_TRIANGLE_STRIP);
+  drawBob(b.particle.getPosition(), shader, GL_TRIANGLES);
 }
 
 int main(void) {
@@ -209,12 +203,14 @@ int main(void) {
   if (window == nullptr) {
     std::cout << "Failed to open glfw window\n";
     glfwTerminate();
+    return -1;
   }
 
   glfwMakeContextCurrent(window);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     std::cout << "Failed to initialize glad\n";
+    return -1;
   }
 
   glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
@@ -230,7 +226,10 @@ int main(void) {
 
   cylinder.initializeAtrributeLocations(vertPosLoc, vertNormLoc, vertTexLoc);
   sphere.initializeAtrributeLocations(vertPosLoc, vertNormLoc, vertTexLoc);
+  lightSphere.initializeAtrributeLocations(vertPosLoc, vertNormLoc, vertTexLoc);
   utils::Shader shader("../shaders/shader.vert", "../shaders/shader.frag");
+  utils::Shader lightShader("../shaders/lightShader.vert",
+                            "../shaders/lightShader.frag");
 
   stingray::ParticleWorld world(2, 4);
   r.rod.particle[0] = &r.particle;
@@ -276,17 +275,10 @@ int main(void) {
 
     int fbWidth, fbHeight;
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-    glViewport(0, 0, fbWidth,
-               fbHeight); // <-- reset before scene draw, not just once at init
-    glDisable(GL_SCISSOR_TEST);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
+    glViewport(0, 0, fbWidth, fbHeight);
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    int vp[4];
-    glGetIntegerv(GL_VIEWPORT, vp);
 
     // ImGui_ImplOpenGL3_NewFrame();
     // ImGui_ImplGlfw_NewFrame();
@@ -298,33 +290,33 @@ int main(void) {
     //     (b.particle.getPosition() - r.particle.getPosition()).magnitude());
     // ImGui::End();
 
-    GLint vao;
-    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &vao);
-    // fprintf(stderr, "frame vao=%d\n", vao);
-    GLboolean cullEnabled = glIsEnabled(GL_CULL_FACE);
-    GLboolean depthEnabled = glIsEnabled(GL_DEPTH_TEST);
-    GLint depthFunc, frontFace, polyMode[2];
-    glGetIntegerv(GL_DEPTH_FUNC, &depthFunc);
-    glGetIntegerv(GL_FRONT_FACE, &frontFace);
-    glGetIntegerv(GL_POLYGON_MODE, polyMode);
-    GLboolean depthMask;
-    glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMask);
-
-    // fprintf(stderr,
-    // "cull=%d depth=%d depthFunc=0x%x front=0x%x polyMode=0x%x,0x%x "
-    // "depthMask=%d\n",
-    // cullEnabled, depthEnabled, depthFunc, frontFace, polyMode[0],
-    // polyMode[1], depthMask);
-
     shader.use();
     shader.setVec3("viewPos", cameraPos);
     shader.setFloat("material.shininess", 32.0f);
 
-    shader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+    glm::vec3 lightPos(5.0f, 5.0f, 7.0f);
+
+    shader.setVec3("dirLight.direction", -lightPos);
     shader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-    shader.setVec3("dirLight.diffuse", 0.05f, 0.5f, 0.5f);
+    shader.setVec3("dirLight.diffuse", 0.5f, 0.5f, 0.5f);
     shader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
+
     renderScene(shader, fbWidth, fbHeight);
+    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+    glm::mat4 projection = glm::mat4(1.0f);
+    projection = glm::perspective(
+        (glm::radians(fov)), (float)fbWidth / (float)fbHeight, 0.1f, 100.0f);
+    lightShader.use();
+
+    glm::mat4 model(1.0f);
+    model = glm::translate(model, lightPos);
+    model = glm::scale(model, glm::vec3(0.2f));
+
+    lightShader.setMat4("view", view);
+    lightShader.setMat4("projection", projection);
+    lightShader.setMat4("model", model);
+    lightSphere.RenderEBO(GL_TRIANGLES, lightSphere.numElements());
 
     // ImGui::Render();
     // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
