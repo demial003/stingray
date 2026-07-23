@@ -177,8 +177,6 @@ void processInput(GLFWwindow *window) {
   }
 }
 void renderScene(utils::Shader &shader, int fbWidth, int fbHeight) {
-  glm::mat4 model = glm::mat4(1.0f);
-
   glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
   glm::mat4 projection = glm::mat4(1.0f);

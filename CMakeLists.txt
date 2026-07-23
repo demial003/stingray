@@ -26,7 +26,8 @@ set(CMAKE_CXX_FLAGS_RELEASE)
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-include_directories(include PRIVATE external/glm external/imgui external/imgui/backends)
+include_directories(include PRIVATE external/glm external/imgui
+                    external/imgui/backends)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
@@ -46,7 +47,7 @@ add_library(
 target_include_directories(imgui PUBLIC ${IMGUI_DIR} ${IMGUI_DIR}/backends)
 target_link_libraries(imgui PUBLIC glfw)
 
-add_compile_options(-Wall -Wextra)
+add_compile_options(-fsanitize=address -Wall -Wextra -Wshadow -Werror)
 add_executable(stingray ${SOURCE_FILES})
 
 target_link_libraries(stingray OpenGL::GL glfw dl glad imgui)
