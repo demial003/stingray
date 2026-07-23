@@ -47,8 +47,14 @@ add_library(
 target_include_directories(imgui PUBLIC ${IMGUI_DIR} ${IMGUI_DIR}/backends)
 target_link_libraries(imgui PUBLIC glfw)
 
-add_compile_options(-fsanitize=address -Wall -Wextra -Wshadow -Werror)
+add_compile_options(-fsanitize=address -Wall -Wextra -Wshadow)
 add_executable(stingray ${SOURCE_FILES})
+
+target_compile_options(
+  stingray PRIVATE $<$<CONFIG:Debug>:-fsanitize=address,undefined
+                   -fno-omit-frame-pointer -g>)
+target_link_options(stingray PRIVATE
+                    $<$<CONFIG:Debug>:-fsanitize=address,undefined>)
 
 target_link_libraries(stingray OpenGL::GL glfw dl glad imgui)
 
