@@ -47,7 +47,7 @@ add_library(
 target_include_directories(imgui PUBLIC ${IMGUI_DIR} ${IMGUI_DIR}/backends)
 target_link_libraries(imgui PUBLIC glfw)
 
-add_compile_options(-fsanitize=address -Wall -Wextra -Wshadow)
+add_compile_options(-Wall -Wextra -Wshadow)
 add_executable(stingray ${SOURCE_FILES})
 
 target_compile_options(
