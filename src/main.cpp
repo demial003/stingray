@@ -3,11 +3,11 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <string>
 
 #include <stingray/particle.h>
 #include <stingray/pworld.h>
 
-#include <string>
 #include <utils/cylinder.h>
 #include <utils/mesh.h>
 #include <utils/shader.h>

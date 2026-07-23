@@ -26,7 +26,7 @@ set(CMAKE_CXX_FLAGS_RELEASE)
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-include_directories(include external/imgui external/imgui/backends)
+include_directories(include PRIVATE external/glm external/imgui external/imgui/backends)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
