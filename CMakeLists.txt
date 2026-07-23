@@ -21,9 +21,6 @@ if(NOT CMAKE_BUILD_TYPE)
       CACHE STRING "Build type" FORCE)
 endif()
 
-set(CMAKE_CXX_FLAGS_DEBUG)
-set(CMAKE_CXX_FLAGS_RELEASE)
-
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 include_directories(include PRIVATE external/glm external/imgui
@@ -56,7 +53,7 @@ target_compile_options(
 target_link_options(stingray PRIVATE
                     $<$<CONFIG:Debug>:-fsanitize=address,undefined>)
 
-target_link_libraries(stingray OpenGL::GL glfw dl glad imgui)
+target_link_libraries(stingray OpenGL::GL glfw imgui)
 
 add_custom_target(
   copy-compile-commands ALL

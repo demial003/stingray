@@ -24,6 +24,12 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 
+extern "C" const char *__lsan_default_suppressions() {
+  return "leak:libnvidia-glcore\n"
+         "leak:libGLX\n"
+         "leak:libglfw\n";
+}
+
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 bool show = true;
