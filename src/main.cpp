@@ -41,6 +41,9 @@ utils::Sphere lightSphere(10, 10);
 
 stingray::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
+unsigned int gridVBO;
+unsigned int gridVAO;
+
 struct Bob {
   stingray::Particle particle;
 };
@@ -77,6 +80,25 @@ float lastY = 300;
 bool firstMouse = true;
 float fov = 45.0f;
 
+void setupGrid() {
+  float vertices[] = {
+      -1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f,  1.0f, 0.0f, 1.0f,
+      1.0f,  0.0f, -1.0f, -1.0f, 0.0f, -1.0f, 1.0f, 0.0f, 1.0f,
+  };
+  glGenBuffers(1, &gridVBO);
+  glGenVertexArrays(1, &gridVAO);
+  glBindVertexArray(gridVAO);
+
+  glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(vertPosLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+                        (void *)0);
+
+  glEnableVertexAttribArray(vertPosLoc);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+}
 void drawBob(stingray::Vec3 position, utils::Shader &shader, GLenum drawMode) {
   glm::mat4 model(1.0f);
   model = glm::translate(model, glm::vec3(position.x, position.y, position.z));
@@ -156,11 +178,11 @@ void processInput(GLFWwindow *window) {
     glfwSetWindowShouldClose(window, true);
   }
 
-  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+  if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
   }
 
-  const float cameraSpeed = 3.5f * deltaTime;
+  const float cameraSpeed = 2.5f * deltaTime;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     cameraPos += cameraSpeed * cameraFront;
   }
@@ -178,8 +200,12 @@ void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
     cameraPos += 2.0f * cameraSpeed * cameraUp;
   }
-  if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
     cameraPos -= 2.0f * cameraSpeed * cameraUp;
+  }
+
+  if (cameraPos.y <= -2.0f) {
+    cameraPos.y = -2.0f;
   }
 }
 void renderScene(utils::Shader &shader, int fbWidth, int fbHeight) {
@@ -217,10 +243,13 @@ int main(void) {
     return -1;
   }
 
-  glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+  int fbWidth, fbHeight;
+  glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+  glViewport(0, 0, fbWidth, fbHeight);
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glDepthFunc(GL_LEQUAL);
   glCullFace(GL_BACK);
+  glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -234,6 +263,7 @@ int main(void) {
   utils::Shader shader("../shaders/shader.vert", "../shaders/shader.frag");
   utils::Shader lightShader("../shaders/lightShader.vert",
                             "../shaders/lightShader.frag");
+  utils::Shader gridShader("../shaders/grid.vert", "../shaders/grid.frag");
 
   stingray::ParticleWorld world(2, 4);
   r.rod.particle[0] = &r.particle;
@@ -254,6 +284,8 @@ int main(void) {
   r.particle.setPosition(0.0, cylinder.getHeight(), 0.0);
   r.particle.setInverseMass(0);
   r.particle.damping = 0.99f;
+
+  setupGrid();
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -277,10 +309,6 @@ int main(void) {
 
     // ImGui::ShowDemoWindow(&show);
 
-    int fbWidth, fbHeight;
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-    glViewport(0, 0, fbWidth, fbHeight);
-
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -294,6 +322,22 @@ int main(void) {
     //     (b.particle.getPosition() - r.particle.getPosition()).magnitude());
     // ImGui::End();
 
+    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+    glm::mat4 projection = glm::mat4(1.0f);
+    projection = glm::perspective(
+        (glm::radians(fov)), (float)fbWidth / (float)fbHeight, 0.1f, 100.0f);
+
+    glBindVertexArray(gridVAO);
+    gridShader.use();
+    gridShader.setMat4("view", view);
+    gridShader.setMat4("projection", projection);
+    glm::mat4 gridModel = glm::mat4(1.0);
+    gridModel = glm::translate(gridModel, glm::vec3(0.0f, -3.0f, 0.0f));
+    gridModel = glm::scale(gridModel, glm::vec3(50.0f, 1.0f, 50.0f));
+    gridShader.setMat4("model", gridModel);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
     shader.use();
     shader.setVec3("viewPos", cameraPos);
     shader.setFloat("material.shininess", 32.0f);
@@ -306,11 +350,7 @@ int main(void) {
     shader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
 
     renderScene(shader, fbWidth, fbHeight);
-    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
-    glm::mat4 projection = glm::mat4(1.0f);
-    projection = glm::perspective(
-        (glm::radians(fov)), (float)fbWidth / (float)fbHeight, 0.1f, 100.0f);
     lightShader.use();
 
     glm::mat4 model(1.0f);

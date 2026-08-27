@@ -61,7 +61,7 @@ void Mesh::CalcVboAndEbo() const {
 }
 
 void Mesh::RenderVBO(GLuint drawMode, unsigned int first,
-                     unsigned int numVerts) {
+                     unsigned int numVerts) const {
   glBindVertexArray(VAO);
   glDrawArrays(drawMode, first, numVerts);
 }

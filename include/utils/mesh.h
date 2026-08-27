@@ -18,7 +18,7 @@ public:
                                             unsigned int normLoc,
                                             unsigned int texLoc);
   virtual void RenderVBO(GLuint drawMode, unsigned int first,
-                         unsigned int numVerts);
+                         unsigned int numVerts) const;
   virtual void RenderEBO(GLuint drawMode, unsigned int numElems) const;
   virtual void genVertices(float *vboIdx, unsigned int *eboIdx) const = 0;
   virtual void CalcVboAndEbo() const;
