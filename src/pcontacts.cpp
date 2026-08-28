@@ -1,5 +1,5 @@
-#include <stingray/pcontacts.h>
-using namespace stingray;
+#include <physics/pcontacts.h>
+using namespace stingray::physics;
 
 void ParticleContact::resolve(real duration) {
   resolveVelocity(duration);

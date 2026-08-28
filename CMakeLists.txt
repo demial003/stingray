@@ -5,10 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(SOURCE_FILES
     src/main.cpp
-    utils/sphere.cpp
-    utils/glad.c
-    utils/cylinder.cpp
-    utils/mesh.cpp
+    renderer/sphere.cpp
+    renderer/glad.c
+    renderer/cylinder.cpp
+    renderer/mesh.cpp
     src/particle.cpp
     src/pcontacts.cpp
     src/pfgen.cpp

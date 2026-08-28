@@ -1,9 +1,9 @@
 
 
 #include <assert.h>
-#include <stingray/particle.h>
+#include <physics/particle.h>
 
-using namespace stingray;
+using namespace stingray::physics;
 
 void Particle::integrate(real duration) {
   assert(duration > 0.0);

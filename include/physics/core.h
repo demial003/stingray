@@ -1,10 +1,11 @@
 #pragma once
 
 #include <cmath>
-// #include <stingray/precision.h>
+// #include <physics/precision.h>
 typedef float real;
 
 namespace stingray {
+namespace physics {
 class Vec3 {
 public:
   real x;
@@ -95,4 +96,5 @@ public:
 private:
   real pad;
 };
+} // namespace physics
 } // namespace stingray

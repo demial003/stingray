@@ -1,6 +1,8 @@
-#include <stingray/pcontacts.h>
+#pragma once
+#include <physics/pcontacts.h>
 
 namespace stingray {
+namespace physics {
 class ParticleLink : public ParticleContactGenerator {
 public:
   Particle *particle[2];
@@ -23,4 +25,5 @@ public:
   real length;
   virtual unsigned addContact(ParticleContact *contact, unsigned limit) const;
 };
+} // namespace physics
 } // namespace stingray

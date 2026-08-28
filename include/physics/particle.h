@@ -1,9 +1,9 @@
-#ifndef PARTICLE_H
-#define PARTICLE_H
+#pragma once
 
-#include <stingray/core.h>
+#include <physics/core.h>
 
 namespace stingray {
+namespace physics {
 class Particle {
 public:
   Vec3 position;
@@ -41,5 +41,5 @@ protected:
   real inverseMass;
 };
 
+} // namespace physics
 } // namespace stingray
-#endif

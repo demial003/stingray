@@ -10,7 +10,8 @@
 #include <string.h>
 #include <sys/wait.h>
 
-namespace utils {
+namespace stingray {
+namespace renderer {
 class Shader {
 public:
   unsigned int ID;
@@ -109,7 +110,8 @@ public:
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE,
                        &mat[0][0]);
   }
-}; // namespace utils
-} // namespace utils
+};
+} // namespace renderer
+} // namespace stingray
 
 #endif

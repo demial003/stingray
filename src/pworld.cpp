@@ -1,5 +1,5 @@
-#include <stingray/pworld.h>
-using namespace stingray;
+#include <physics/pworld.h>
+using namespace stingray::physics;
 
 ParticleWorld::ParticleWorld(unsigned maxContacts, unsigned iterations)
     : resolver(iterations), maxContacts(maxContacts) {

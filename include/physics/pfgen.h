@@ -1,7 +1,9 @@
-#include <stingray/particle.h>
+#pragma once
+#include <physics/particle.h>
 #include <vector>
 
 namespace stingray {
+namespace physics {
 
 class ParticleForceGenerator {
 public:
@@ -90,4 +92,5 @@ public:
   virtual void updateForce(Particle *particle, real duration);
 };
 
+} // namespace physics
 } // namespace stingray

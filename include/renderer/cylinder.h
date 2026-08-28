@@ -1,8 +1,9 @@
 #ifndef CYLINDER_H
 #define CYLINDER_H
 
-#include "utils/mesh.h"
-namespace utils {
+#include "renderer/mesh.h"
+namespace stingray {
+namespace renderer {
 class Cylinder : public Mesh {
 public:
   Cylinder() : slices(6), height(2.0f) {}
@@ -17,6 +18,6 @@ private:
   float height;
   int getVertexNumber(int i);
 };
-} // namespace utils
-
+} // namespace renderer
+} // namespace stingray
 #endif

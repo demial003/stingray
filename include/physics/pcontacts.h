@@ -1,5 +1,8 @@
-#include <stingray/particle.h>
+#pragma once
+
+#include <physics/particle.h>
 namespace stingray {
+namespace physics {
 
 class ParticleContact {
 
@@ -37,4 +40,5 @@ public:
   virtual unsigned addContact(ParticleContact *contat,
                               unsigned limit) const = 0;
 };
+} // namespace physics
 } // namespace stingray

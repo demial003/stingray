@@ -1,8 +1,9 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include "utils/mesh.h"
-namespace utils {
+#include "renderer/mesh.h"
+namespace stingray {
+namespace renderer {
 class Sphere : public Mesh {
 public:
   Sphere() : slices(6), stacks(6) {}
@@ -20,5 +21,6 @@ private:
   int stacks;
   int getVertexNumber(int i, int j) const;
 };
-} // namespace utils
+} // namespace renderer
+} // namespace stingray
 #endif

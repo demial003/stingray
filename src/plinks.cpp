@@ -1,5 +1,5 @@
-#include <stingray/plinks.h>
-using namespace stingray;
+#include <physics/plinks.h>
+using namespace stingray::physics;
 
 real ParticleLink::currentLength() const {
   Vec3 relativePos = particle[0]->getPosition() - particle[1]->getPosition();

@@ -1,8 +1,22 @@
 #ifndef MESH_H
 #define MESH_H
-#include <glad/glad.h>
 
-namespace utils {
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+
+struct Vertex {
+  glm::vec3 Position;
+  glm::vec3 Normal;
+  glm::vec3 TexCoords;
+};
+
+struct Texture {
+  unsigned int id;
+  std::string type;
+};
+
+namespace stingray {
+namespace renderer {
 class Mesh {
 
 public:
@@ -35,6 +49,6 @@ private:
   unsigned int vertNormLoc = 1;
   unsigned int vertTexLoc = 2;
 };
-} // namespace utils
-
+} // namespace renderer
+} // namespace stingray
 #endif

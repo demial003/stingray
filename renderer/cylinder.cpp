@@ -1,7 +1,7 @@
 #include <cmath>
-#include <utils/cylinder.h>
+#include <renderer/cylinder.h>
 
-namespace utils {
+using namespace stingray::renderer;
 void Cylinder::genVertices(float *vboIdx, unsigned int *eboIdx) const {
   for (auto j = 0; j <= slices; j++) {
     float phi = (float)(j % slices) / float(slices) * M_PI * 2.0f;
@@ -35,4 +35,3 @@ void Cylinder::genVertices(float *vboIdx, unsigned int *eboIdx) const {
 
 int Cylinder::numVertices() const { return 16 * (slices + 1); }
 int Cylinder::numElements() const { return 0; };
-} // namespace utils

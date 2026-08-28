@@ -1,11 +1,9 @@
 #pragma once
 
-#ifndef PWORLD_H
-#define PWORLD_H
-
-#include <stingray/pfgen.h>
-#include <stingray/plinks.h>
+#include <physics/pfgen.h>
+#include <physics/plinks.h>
 namespace stingray {
+namespace physics {
 class ParticleWorld {
 public:
   typedef std::vector<Particle *> Particles;
@@ -35,5 +33,5 @@ public:
   void integrate(real duration);
   void runPhysics(real duration);
 };
+} // namespace physics
 } // namespace stingray
-#endif

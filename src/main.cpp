@@ -10,13 +10,13 @@
 #include <assimp/scene.h>
 #include <assimp/version.h>
 
-#include <stingray/particle.h>
-#include <stingray/pworld.h>
+#include <physics/particle.h>
+#include <physics/pworld.h>
 
-#include <utils/cylinder.h>
-#include <utils/mesh.h>
-#include <utils/shader.h>
-#include <utils/sphere.h>
+#include <renderer/cylinder.h>
+#include <renderer/mesh.h>
+#include <renderer/shader.h>
+#include <renderer/sphere.h>
 
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -40,22 +40,22 @@ float lastFrame = 0.0f;
 bool show = true;
 float initialTheta = glm::radians(100.0f);
 
-utils::Sphere sphere = utils::Sphere(100, 100);
-utils::Cylinder cylinder = utils::Cylinder(100, 5);
-utils::Sphere lightSphere(10, 10);
+stingray::renderer::Sphere sphere = stingray::renderer::Sphere(100, 100);
+stingray::renderer::Cylinder cylinder = stingray::renderer::Cylinder(100, 5);
+stingray::renderer::Sphere lightSphere(10, 10);
 
-stingray::Vec3 GRAVITY(0.0, -9.81, 0.0);
+stingray::physics::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
 unsigned int gridVBO;
 unsigned int gridVAO;
 
 struct Bob {
-  stingray::Particle particle;
+  stingray::physics::Particle particle;
 };
 
 struct Rod {
-  stingray::Particle particle;
-  stingray::ParticleRod rod;
+  stingray::physics::Particle particle;
+  stingray::physics::ParticleRod rod;
 };
 
 Bob b;
@@ -104,7 +104,8 @@ void setupGrid() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 }
-void drawBob(stingray::Vec3 position, utils::Shader &shader, GLenum drawMode) {
+void drawBob(stingray::physics::Vec3 position,
+             stingray::renderer::Shader &shader, GLenum drawMode) {
   glm::mat4 model(1.0f);
   model = glm::translate(model, glm::vec3(position.x, position.y, position.z));
   model = glm::scale(model, glm::vec3(0.8f));
@@ -113,11 +114,11 @@ void drawBob(stingray::Vec3 position, utils::Shader &shader, GLenum drawMode) {
   sphere.RenderEBO(drawMode, idxSize);
 }
 
-void drawRod(stingray::Vec3 rPos, stingray::Vec3 bPos, utils::Shader &shader,
-             GLenum drawMode) {
-  stingray::Vec3 dir = rPos - bPos;
+void drawRod(stingray::physics::Vec3 rPos, stingray::physics::Vec3 bPos,
+             stingray::renderer::Shader &shader, GLenum drawMode) {
+  stingray::physics::Vec3 dir = rPos - bPos;
   dir.normalize();
-  float theta = dir.dotProduct(stingray::Vec3(0, 1, 0));
+  float theta = dir.dotProduct(stingray::physics::Vec3(0, 1, 0));
   theta = acosf(theta);
 
   glm::vec3 axis =
@@ -213,7 +214,8 @@ void processInput(GLFWwindow *window) {
     cameraPos.y = -2.0f;
   }
 }
-void renderScene(utils::Shader &shader, int fbWidth, int fbHeight) {
+void renderScene(stingray::renderer::Shader &shader, int fbWidth,
+                 int fbHeight) {
   glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
   glm::mat4 projection = glm::mat4(1.0f);
@@ -228,10 +230,6 @@ void renderScene(utils::Shader &shader, int fbWidth, int fbHeight) {
 }
 
 int main(void) {
-
-  Assimp::Importer importer;
-  std::cout << "assimp alive: " << aiGetVersionMajor() << "."
-            << aiGetVersionMinor() << "\n";
 
   GLFWwindow *window;
   glfwInit();
@@ -270,12 +268,14 @@ int main(void) {
   cylinder.initializeAtrributeLocations(vertPosLoc, vertNormLoc, vertTexLoc);
   sphere.initializeAtrributeLocations(vertPosLoc, vertNormLoc, vertTexLoc);
   lightSphere.initializeAtrributeLocations(vertPosLoc, vertNormLoc, vertTexLoc);
-  utils::Shader shader("../shaders/shader.vert", "../shaders/shader.frag");
-  utils::Shader lightShader("../shaders/lightShader.vert",
-                            "../shaders/lightShader.frag");
-  utils::Shader gridShader("../shaders/grid.vert", "../shaders/grid.frag");
+  stingray::renderer::Shader shader("../shaders/shader.vert",
+                                    "../shaders/shader.frag");
+  stingray::renderer::Shader lightShader("../shaders/lightShader.vert",
+                                         "../shaders/lightShader.frag");
+  stingray::renderer::Shader gridShader("../shaders/grid.vert",
+                                        "../shaders/grid.frag");
 
-  stingray::ParticleWorld world(2, 4);
+  stingray::physics::ParticleWorld world(2, 4);
   r.rod.particle[0] = &r.particle;
   r.rod.particle[1] = &b.particle;
 

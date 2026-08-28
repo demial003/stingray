@@ -1,8 +1,8 @@
-#include "utils/mesh.h"
+#include "renderer/mesh.h"
 #include <glad/glad.h>
 #include <iostream>
 
-using namespace utils;
+using namespace stingray::renderer;
 
 void Mesh::initializeAtrributeLocations(unsigned int posLoc,
                                         unsigned int normLoc,

@@ -1,7 +1,7 @@
-#include "utils/sphere.h"
+#include "renderer/sphere.h"
 #include <cmath>
 
-namespace utils {
+using namespace stingray::renderer;
 void Sphere::genVertices(float *vboIdx, unsigned int *eboIdx) const {
 
   for (auto i = 0; i < slices; i++) {
@@ -69,4 +69,3 @@ int Sphere::getVertexNumber(int i, int j) const {
 
 int Sphere::numVertices() const { return 8 * (slices * (stacks - 1) + 2); }
 int Sphere::numElements() const { return 6 * slices * (stacks - 1); }
-} // namespace utils
