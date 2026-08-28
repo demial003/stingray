@@ -5,15 +5,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(SOURCE_FILES
     src/main.cpp
-    renderer/sphere.cpp
-    renderer/glad.c
-    renderer/cylinder.cpp
-    renderer/mesh.cpp
-    src/particle.cpp
-    src/pcontacts.cpp
-    src/pfgen.cpp
-    src/pworld.cpp
-    src/plinks.cpp)
+    src/renderer/sphere.cpp
+    src/renderer/glad.c
+    src/renderer/cylinder.cpp
+    src/renderer/mesh.cpp
+    src/physics/particle.cpp
+    src/physics/pcontacts.cpp
+    src/physics/pfgen.cpp
+    src/physics/pworld.cpp
+    src/physics/plinks.cpp)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE
