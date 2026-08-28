@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.13)
 project(stingray)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -24,13 +24,15 @@ endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 include_directories(include PRIVATE external/glm external/imgui
-                    external/imgui/backends external/assimp)
+                    external/imgui/backends)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 
+set(BUILD_SHARED_LIBS
+    OFF
+    CACHE BOOL "" FORCE)
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)
-set(ASSIMP_DIR ${CMAKE_SOURCE_DIR}/external/assimp)
 
 add_library(
   imgui STATIC
@@ -42,19 +44,25 @@ add_library(
   ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
   ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp)
 
+set(ASSIMP_BUILD_TESTS
+    OFF
+    CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ASSIMP_TOOLS
+    OFF
+    CACHE BOOL "" FORCE)
+add_subdirectory(external/assimp)
+
 target_include_directories(imgui PUBLIC ${IMGUI_DIR} ${IMGUI_DIR}/backends)
 target_link_libraries(imgui PUBLIC glfw)
 
-add_compile_options(-Wall -Wextra -Wshadow)
 add_executable(stingray ${SOURCE_FILES})
-
 target_compile_options(
   stingray PRIVATE $<$<CONFIG:Debug>:-fsanitize=address,undefined
                    -fno-omit-frame-pointer -g>)
 target_link_options(stingray PRIVATE
                     $<$<CONFIG:Debug>:-fsanitize=address,undefined>)
 
-target_link_libraries(stingray OpenGL::GL glfw imgui)
+target_link_libraries(stingray OpenGL::GL glfw imgui assimp)
 
 add_custom_target(
   copy-compile-commands ALL

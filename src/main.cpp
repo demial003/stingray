@@ -5,6 +5,11 @@
 #include <iostream>
 #include <string>
 
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+#include <assimp/version.h>
+
 #include <stingray/particle.h>
 #include <stingray/pworld.h>
 
@@ -223,6 +228,11 @@ void renderScene(utils::Shader &shader, int fbWidth, int fbHeight) {
 }
 
 int main(void) {
+
+  Assimp::Importer importer;
+  std::cout << "assimp alive: " << aiGetVersionMajor() << "."
+            << aiGetVersionMinor() << "\n";
+
   GLFWwindow *window;
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
