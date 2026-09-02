@@ -1,26 +1,37 @@
-#ifndef MESH_H
-#define MESH_H
+#pragma once
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <renderer/shader.h>
 
+namespace stingray {
+namespace renderer {
 struct Vertex {
   glm::vec3 Position;
   glm::vec3 Normal;
-  glm::vec3 TexCoords;
+  glm::vec2 TexCoords;
 };
 
 struct Texture {
   unsigned int id;
   std::string type;
 };
-
-namespace stingray {
-namespace renderer {
 class Mesh {
 
 public:
-  Mesh() {}
+  std::vector<Vertex> vertices;
+  std::vector<unsigned int> indices;
+  std::vector<Texture> textures;
+
+  Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
+       std::vector<Texture> textures) {
+    this->vertices = vertices;
+    this->indices = indices;
+    this->textures = textures;
+
+    setupMesh();
+  }
+  Mesh() = default;
   ~Mesh();
 
   Mesh(const Mesh &) = delete;
@@ -28,19 +39,15 @@ public:
   Mesh(Mesh &&) = delete;
   Mesh &operator=(Mesh &&) = delete;
 
-  virtual void initializeAtrributeLocations(unsigned int posLoc,
-                                            unsigned int normLoc,
-                                            unsigned int texLoc);
-  virtual void RenderVBO(GLuint drawMode, unsigned int first,
-                         unsigned int numVerts) const;
-  virtual void RenderEBO(GLuint drawMode, unsigned int numElems) const;
-  virtual void genVertices(float *vboIdx, unsigned int *eboIdx) const = 0;
-  virtual void CalcVboAndEbo() const;
-  virtual int numVertices() const = 0;
-  virtual int numElements() const = 0;
+  virtual void genVertices() = 0;
+
   virtual int getVAO() { return VAO; };
 
-private:
+  virtual void Draw(Shader &shader);
+
+protected:
+  void setupMesh();
+
   unsigned int VBO = 0;
   unsigned int VAO = 0;
   unsigned int EBO = 0;
@@ -48,7 +55,8 @@ private:
   unsigned int vertPosLoc = 0;
   unsigned int vertNormLoc = 1;
   unsigned int vertTexLoc = 2;
+
+  GLenum drawMode = GL_TRIANGLES;
 };
 } // namespace renderer
 } // namespace stingray
-#endif

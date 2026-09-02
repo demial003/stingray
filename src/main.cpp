@@ -42,7 +42,7 @@ float initialTheta = glm::radians(100.0f);
 
 stingray::renderer::Sphere sphere = stingray::renderer::Sphere(100, 100);
 stingray::renderer::Cylinder cylinder = stingray::renderer::Cylinder(100, 5);
-stingray::renderer::Sphere lightSphere(10, 10);
+stingray::renderer::Sphere lightSphere(50, 50);
 
 stingray::physics::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
@@ -69,8 +69,6 @@ unsigned int vertNormLoc = 1;
 unsigned int vertTexLoc = 2;
 
 std::vector<std::string> vec;
-unsigned int vertsSize = cylinder.numVertices();
-unsigned int idxSize = sphere.numElements();
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 20.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -111,7 +109,7 @@ void drawBob(stingray::physics::Vec3 position,
   model = glm::scale(model, glm::vec3(0.8f));
 
   shader.setMat4("model", model);
-  sphere.RenderEBO(drawMode, idxSize);
+  sphere.Draw(shader);
 }
 
 void drawRod(stingray::physics::Vec3 rPos, stingray::physics::Vec3 bPos,
@@ -132,7 +130,7 @@ void drawRod(stingray::physics::Vec3 rPos, stingray::physics::Vec3 bPos,
   model = glm::scale(model, glm::vec3(0.1f, 1.0f, 0.1f));
 
   shader.setMat4("model", model);
-  cylinder.RenderVBO(drawMode, 0, vertsSize);
+  cylinder.Draw(shader);
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -230,7 +228,6 @@ void renderScene(stingray::renderer::Shader &shader, int fbWidth,
 }
 
 int main(void) {
-
   GLFWwindow *window;
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -265,9 +262,6 @@ int main(void) {
   glfwSetScrollCallback(window, scroll_callback);
   glfwSetCursorPosCallback(window, mouse_callback);
 
-  cylinder.initializeAtrributeLocations(vertPosLoc, vertNormLoc, vertTexLoc);
-  sphere.initializeAtrributeLocations(vertPosLoc, vertNormLoc, vertTexLoc);
-  lightSphere.initializeAtrributeLocations(vertPosLoc, vertNormLoc, vertTexLoc);
   stingray::renderer::Shader shader("../shaders/shader.vert",
                                     "../shaders/shader.frag");
   stingray::renderer::Shader lightShader("../shaders/lightShader.vert",
@@ -276,6 +270,11 @@ int main(void) {
                                         "../shaders/grid.frag");
 
   stingray::physics::ParticleWorld world(2, 4);
+
+  cylinder.genVertices();
+  sphere.genVertices();
+  lightSphere.genVertices();
+
   r.rod.particle[0] = &r.particle;
   r.rod.particle[1] = &b.particle;
 
@@ -370,7 +369,7 @@ int main(void) {
     lightShader.setMat4("view", view);
     lightShader.setMat4("projection", projection);
     lightShader.setMat4("model", model);
-    lightSphere.RenderEBO(GL_TRIANGLES, lightSphere.numElements());
+    lightSphere.Draw(lightShader);
 
     // ImGui::Render();
     // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

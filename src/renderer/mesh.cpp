@@ -1,74 +1,65 @@
 #include "renderer/mesh.h"
 #include <glad/glad.h>
-#include <iostream>
+#include <vector>
 
 using namespace stingray::renderer;
 
-void Mesh::initializeAtrributeLocations(unsigned int posLoc,
-                                        unsigned int normLoc,
-                                        unsigned int texLoc) {
-
-  if (VAO == 0) {
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-  }
-
-  int numVerts = numVertices();
-  int numElems = numElements();
-  vertPosLoc = posLoc;
-  vertNormLoc = normLoc;
-  vertTexLoc = texLoc;
+void Mesh::setupMesh() {
+  glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &VBO);
+  glGenBuffers(1, &EBO);
 
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, numVerts * sizeof(float), 0, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, numElems * sizeof(int), 0,
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0],
                GL_STATIC_DRAW);
 
-  glVertexAttribPointer(vertPosLoc, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+  if (indices.size() != 0) {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
+                 &indices[0], GL_STATIC_DRAW);
+  }
+
+  glVertexAttribPointer(vertPosLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                         (void *)0);
   glEnableVertexAttribArray(vertPosLoc);
 
-  glVertexAttribPointer(vertNormLoc, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                        (void *)(3 * sizeof(float)));
+  glVertexAttribPointer(vertNormLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        (void *)offsetof(Vertex, Normal));
   glEnableVertexAttribArray(vertNormLoc);
-  glVertexAttribPointer(vertTexLoc, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                        (void *)(6 * sizeof(float)));
+
+  glVertexAttribPointer(vertTexLoc, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        (void *)offsetof(Vertex, TexCoords));
   glEnableVertexAttribArray(vertTexLoc);
 
-  CalcVboAndEbo();
-}
-
-void Mesh::CalcVboAndEbo() const {
-
-  glBindVertexArray(VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-  float *vboBuffer = (float *)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-  unsigned int *eboBuffer =
-      (unsigned int *)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
-  genVertices(vboBuffer, eboBuffer);
-  glUnmapBuffer(GL_ARRAY_BUFFER);
-  glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-
   glBindVertexArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Mesh::RenderVBO(GLuint drawMode, unsigned int first,
-                     unsigned int numVerts) const {
-  glBindVertexArray(VAO);
-  glDrawArrays(drawMode, first, numVerts);
-}
+void Mesh::Draw(Shader &shader) {
+  unsigned int diffuseNr = 1;
+  unsigned int specularNr = 1;
+  for (unsigned int i = 0; i < textures.size(); i++) {
+    glActiveTexture(GL_TEXTURE0 + i);
+    std::string number;
+    std::string name = textures[i].type;
+    if (name == "texture_diffuse")
+      number = std::to_string(diffuseNr++);
+    else if (name == "texture_specular")
+      number = std::to_string(specularNr++);
 
-void Mesh::RenderEBO(GLuint drawMode, unsigned int numElems) const {
+    shader.setInt(("material." + name + number).c_str(), i);
+    glBindTexture(GL_TEXTURE_2D, textures[i].id);
+  }
+  glActiveTexture(GL_TEXTURE0);
+
   glBindVertexArray(VAO);
-  glDrawElements(drawMode, numElems, GL_UNSIGNED_INT, 0);
+  if (indices.empty()) {
+    glDrawArrays(drawMode, 0, vertices.size());
+  } else {
+    glDrawElements(drawMode, indices.size(), GL_UNSIGNED_INT, 0);
+  }
+  glBindVertexArray(0);
 }
 
 Mesh::~Mesh() {
