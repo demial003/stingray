@@ -6,7 +6,7 @@ namespace renderer {
 class Sphere : public Mesh {
 public:
   Sphere() : slices(6), stacks(6) {}
-  Sphere(const int stacks, const int slices) : slices(slices), stacks(stacks) {}
+  Sphere(int slices, int stacks) : slices(slices), stacks(stacks) {}
 
   virtual void genVertices() override;
 

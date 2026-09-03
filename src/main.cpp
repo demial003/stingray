@@ -5,6 +5,8 @@
 #include <iostream>
 #include <string>
 
+#include <stb/stb_image.h>
+
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
@@ -13,8 +15,10 @@
 #include <physics/particle.h>
 #include <physics/pworld.h>
 
+#include <renderer/camera.h>
 #include <renderer/cylinder.h>
 #include <renderer/mesh.h>
+#include <renderer/model.h>
 #include <renderer/shader.h>
 #include <renderer/sphere.h>
 
@@ -27,7 +31,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <vector>
 
 extern "C" const char *__lsan_default_suppressions() {
   return "leak:libnvidia-glcore\n"
@@ -35,14 +38,11 @@ extern "C" const char *__lsan_default_suppressions() {
          "leak:libglfw\n";
 }
 
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
-bool show = true;
-float initialTheta = glm::radians(100.0f);
+float initialTheta = glm::radians(0.0f);
 
 stingray::renderer::Sphere sphere = stingray::renderer::Sphere(100, 100);
 stingray::renderer::Cylinder cylinder = stingray::renderer::Cylinder(100, 5);
-stingray::renderer::Sphere lightSphere(50, 50);
+stingray::renderer::Sphere lightSphere(10, 10);
 
 stingray::physics::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
@@ -68,20 +68,16 @@ unsigned int vertPosLoc = 0;
 unsigned int vertNormLoc = 1;
 unsigned int vertTexLoc = 2;
 
-std::vector<std::string> vec;
+stingray::renderer::Camera camera(glm::vec3(0.0f, 0.0f, 20.0f));
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 20.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-float yaw = -90.0f;
-float pitch = 0.0f;
-
-float lastX = 400;
-float lastY = 300;
-
+float lastX = SCR_WIDTH / 2.0;
+float lastY = SCR_HEIGHT / 2.0;
 bool firstMouse = true;
-float fov = 45.0f;
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+unsigned int whiteTex;
 
 void setupGrid() {
   float vertices[] = {
@@ -103,17 +99,24 @@ void setupGrid() {
   glBindVertexArray(0);
 }
 void drawBob(stingray::physics::Vec3 position,
-             stingray::renderer::Shader &shader, GLenum drawMode) {
+             stingray::renderer::Shader &shader) {
   glm::mat4 model(1.0f);
   model = glm::translate(model, glm::vec3(position.x, position.y, position.z));
   model = glm::scale(model, glm::vec3(0.8f));
 
   shader.setMat4("model", model);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, whiteTex);
+  shader.setInt("material.texture_diffuse1", 0);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, whiteTex);
+
   sphere.Draw(shader);
 }
 
 void drawRod(stingray::physics::Vec3 rPos, stingray::physics::Vec3 bPos,
-             stingray::renderer::Shader &shader, GLenum drawMode) {
+             stingray::renderer::Shader &shader) {
   stingray::physics::Vec3 dir = rPos - bPos;
   dir.normalize();
   float theta = dir.dotProduct(stingray::physics::Vec3(0, 1, 0));
@@ -129,6 +132,13 @@ void drawRod(stingray::physics::Vec3 rPos, stingray::physics::Vec3 bPos,
   }
   model = glm::scale(model, glm::vec3(0.1f, 1.0f, 0.1f));
 
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, whiteTex);
+  shader.setInt("material.texture_diffuse1", 0);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, whiteTex);
+  shader.setInt("material.texture_specular1", 1);
+
   shader.setMat4("model", model);
   cylinder.Draw(shader);
 }
@@ -140,44 +150,29 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-  fov -= (float)yoffset;
-  if (fov < 1.0f)
-    fov = 1.0f;
-  if (fov > 45.0f)
-    fov = 45.0f;
+  camera.processMouseScroll(static_cast<float>(yoffset));
 }
 
-void mouse_callback(GLFWwindow *window, double xPos, double yPos) {
+void mouse_callback(GLFWwindow *window, double xPosIn, double yPosIn) {
+  float xpos = static_cast<float>(xPosIn);
+  float ypos = static_cast<float>(yPosIn);
+
   if (firstMouse) {
-    lastX = xPos;
-    lastY = yPos;
+    lastX = xpos;
+    lastY = ypos;
     firstMouse = false;
   }
-  float xoffset = xPos - lastX;
-  float yoffset = lastY - yPos;
 
-  lastX = xPos;
-  lastY = yPos;
+  float xoffset = xpos - lastX;
+  float yoffset = lastY - ypos;
 
-  const float sensitivity = 0.08f;
-  xoffset *= sensitivity;
-  yoffset *= sensitivity;
+  lastX = xpos;
+  lastY = ypos;
 
-  yaw += xoffset;
-  pitch += yoffset;
-
-  if (pitch > 89.0f)
-    pitch = 89.0f;
-  if (pitch < -89.0f)
-    pitch = -89.0f;
-
-  glm::vec3 direction;
-  direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-  direction.y = sin(glm::radians(pitch));
-  direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-  cameraFront = glm::normalize(direction);
+  camera.processMouseMovement(xoffset, yoffset);
 }
 void processInput(GLFWwindow *window) {
+  using namespace stingray::renderer;
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   }
@@ -186,45 +181,39 @@ void processInput(GLFWwindow *window) {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
   }
 
-  const float cameraSpeed = 2.5f * deltaTime;
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    cameraPos += cameraSpeed * cameraFront;
-  }
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    cameraPos -= cameraSpeed * cameraFront;
-  }
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    cameraPos -=
-        glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-  }
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    cameraPos +=
-        glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-  }
-  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-    cameraPos += 2.0f * cameraSpeed * cameraUp;
-  }
-  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-    cameraPos -= 2.0f * cameraSpeed * cameraUp;
+  if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
 
-  if (cameraPos.y <= -2.0f) {
-    cameraPos.y = -2.0f;
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    camera.processKeyboard(FORWARD, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    camera.processKeyboard(BACKWARD, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    camera.processKeyboard(LEFT, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    camera.processKeyboard(RIGHT, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    camera.processKeyboard(DOWN, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    camera.processKeyboard(UP, deltaTime);
+
+  if (camera.position.y <= -2.0f) {
+    camera.position.y = -2.0f;
   }
 }
 void renderScene(stingray::renderer::Shader &shader, int fbWidth,
                  int fbHeight) {
-  glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+  glm::mat4 view = camera.getViewMatrix();
 
   glm::mat4 projection = glm::mat4(1.0f);
-  projection = glm::perspective((glm::radians(fov)),
+  projection = glm::perspective((glm::radians(camera.zoom)),
                                 (float)fbWidth / (float)fbHeight, 0.1f, 100.0f);
   shader.setMat4("view", view);
   shader.setMat4("projection", projection);
 
-  drawRod(r.particle.getPosition(), b.particle.getPosition(), shader,
-          GL_TRIANGLE_STRIP);
-  drawBob(b.particle.getPosition(), shader, GL_TRIANGLES);
+  drawRod(r.particle.getPosition(), b.particle.getPosition(), shader);
+  drawBob(b.particle.getPosition(), shader);
 }
 
 int main(void) {
@@ -251,7 +240,6 @@ int main(void) {
   int fbWidth, fbHeight;
   glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
   glViewport(0, 0, fbWidth, fbHeight);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glDepthFunc(GL_LEQUAL);
   glCullFace(GL_BACK);
   glEnable(GL_DEPTH_TEST);
@@ -271,8 +259,8 @@ int main(void) {
 
   stingray::physics::ParticleWorld world(2, 4);
 
-  cylinder.genVertices();
   sphere.genVertices();
+  cylinder.genVertices();
   lightSphere.genVertices();
 
   r.rod.particle[0] = &r.particle;
@@ -306,6 +294,17 @@ int main(void) {
 
   ImGui_ImplOpenGL3_Init();
 
+  stbi_set_flip_vertically_on_load(true);
+  stingray::renderer::Model bag("../assets/backpack.obj");
+
+  glGenTextures(1, &whiteTex);
+  glBindTexture(GL_TEXTURE_2D, whiteTex);
+  unsigned char whitePixel[] = {255, 255, 255, 255};
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+               whitePixel);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
@@ -331,11 +330,12 @@ int main(void) {
     //     (b.particle.getPosition() - r.particle.getPosition()).magnitude());
     // ImGui::End();
 
-    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    glm::mat4 view = camera.getViewMatrix();
 
     glm::mat4 projection = glm::mat4(1.0f);
-    projection = glm::perspective(
-        (glm::radians(fov)), (float)fbWidth / (float)fbHeight, 0.1f, 100.0f);
+    projection =
+        glm::perspective((glm::radians(camera.zoom)),
+                         (float)fbWidth / (float)fbHeight, 0.1f, 100.0f);
 
     glBindVertexArray(gridVAO);
     gridShader.use();
@@ -348,7 +348,10 @@ int main(void) {
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     shader.use();
-    shader.setVec3("viewPos", cameraPos);
+    shader.setMat4("view", view);
+    shader.setMat4("projection", projection);
+    // shader.setVec3("diffuseColor", glm::vec3(0.8f, 0.5f, 0.2f));
+    shader.setVec3("viewPos", camera.position);
     shader.setFloat("material.shininess", 32.0f);
 
     glm::vec3 lightPos(5.0f, 5.0f, 7.0f);
@@ -358,6 +361,13 @@ int main(void) {
     shader.setVec3("dirLight.diffuse", 0.5f, 0.5f, 0.5f);
     shader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
 
+    glm::mat4 bagModel(1.0f);
+    bagModel = glm::translate(bagModel, glm::vec3(20.0f, 0.0f, 4.0f));
+    shader.setMat4("model", bagModel);
+    shader.setVec3("material.diffuseColor", glm::vec3(0.8f, 0.5f, 0.2f));
+    bag.Draw(shader);
+
+    shader.setVec3("material.diffuseColor", glm::vec3(1.0f));
     renderScene(shader, fbWidth, fbHeight);
 
     lightShader.use();

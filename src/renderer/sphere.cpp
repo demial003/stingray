@@ -79,11 +79,5 @@ void Sphere::genVertices() {
 }
 
 unsigned int Sphere::getVertexNumber(int i, int j) const {
-  if (j == 0) {
-    return 0;
-  } else if (j == stacks) {
-    return 1;
-  } else {
-    return (stacks - 1) * (i % slices) + j + 1;
-  }
+  return (i % slices) * (stacks + 1) + j;
 }

@@ -29,7 +29,7 @@ protected:
   unsigned iterationsUsed;
 
 public:
-  ParticleContactResolver(unsigned iterations);
+  ParticleContactResolver(unsigned iter);
   void setIterations(unsigned iterations);
   void resolveContacts(ParticleContact *contactArray, unsigned numContacts,
                        real duration);

@@ -15,6 +15,7 @@ struct Vertex {
 struct Texture {
   unsigned int id;
   std::string type;
+  std::string path;
 };
 class Mesh {
 
@@ -34,12 +35,32 @@ public:
   Mesh() = default;
   ~Mesh();
 
+  Mesh(Mesh &&other) noexcept
+      : vertices(std::move(other.vertices)), indices(std::move(other.indices)),
+        textures(std::move(other.textures)), VAO(other.VAO), VBO(other.VBO),
+        EBO(other.EBO) {
+    other.VAO = other.VBO = other.EBO = 0;
+  }
+
+  Mesh &operator=(Mesh &&other) noexcept {
+    if (this != &other) {
+      glDeleteVertexArrays(1, &VAO);
+      glDeleteBuffers(1, &VBO);
+      glDeleteBuffers(1, &EBO);
+      vertices = std::move(other.vertices);
+      indices = std::move(other.indices);
+      textures = std::move(other.textures);
+      VAO = other.VAO;
+      VBO = other.VBO;
+      EBO = other.EBO;
+      other.VAO = other.VBO = other.EBO = 0;
+    }
+    return *this;
+  }
   Mesh(const Mesh &) = delete;
   Mesh &operator=(const Mesh &) = delete;
-  Mesh(Mesh &&) = delete;
-  Mesh &operator=(Mesh &&) = delete;
 
-  virtual void genVertices() = 0;
+  virtual void genVertices();
 
   virtual int getVAO() { return VAO; };
 

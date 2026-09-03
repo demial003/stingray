@@ -33,9 +33,7 @@ void Particle::setVelocity(real x, real y, real z) {
   Particle::velocity.z = z;
 }
 
-void Particle::setVelocity(const Vec3 &velocity) {
-  Particle::velocity = velocity;
-}
+void Particle::setVelocity(const Vec3 &vel) { Particle::velocity = vel; }
 
 void Particle::setPosition(real x, real y, real z) {
   Particle::position.x = x;
@@ -43,9 +41,7 @@ void Particle::setPosition(real x, real y, real z) {
   Particle::position.z = z;
 }
 
-void Particle::setPosition(const Vec3 &position) {
-  Particle::position = position;
-}
+void Particle::setPosition(const Vec3 &pos) { Particle::position = pos; }
 Vec3 Particle::getPosition() const { return Particle::position; }
 void Particle::getPosition(Vec3 *dest) const { *(dest) = Particle::position; }
 
@@ -55,8 +51,8 @@ void Particle::setAcceleration(real x, real y, real z) {
   Particle::acceleration.z = z;
 }
 
-void Particle::setAcceleration(const Vec3 &acceleration) {
-  Particle::acceleration = acceleration;
+void Particle::setAcceleration(const Vec3 &acc) {
+  Particle::acceleration = acc;
 }
 Vec3 Particle::getAcceleration() const { return Particle::acceleration; }
 void Particle::getAcceleration(Vec3 *dest) const {

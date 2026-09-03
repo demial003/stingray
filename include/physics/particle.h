@@ -24,11 +24,11 @@ public:
   Vec3 getPosition() const;
   void getAcceleration(Vec3 *dest) const;
   Vec3 getAcceleration() const;
-  void setVelocity(const Vec3 &velocity);
+  void setVelocity(const Vec3 &vel);
   void setVelocity(real x, real y, real z);
-  void setPosition(const Vec3 &position);
+  void setPosition(const Vec3 &pos);
   void setPosition(real x, real y, real z);
-  void setAcceleration(const Vec3 &acceleration);
+  void setAcceleration(const Vec3 &acc);
   void setAcceleration(real x, real y, real z);
   real getMass() const { return 1 / inverseMass; }
   real getInverseMass() const { return inverseMass; }

@@ -2,8 +2,9 @@
 out vec4 FragColor;
 
 struct Material {
-  sampler2D diffuse;
-  sampler2D specular;
+  sampler2D texture_diffuse1;
+  sampler2D texture_specular1;
+  vec3 diffuseColor;
   float shininess;
 };
 
@@ -40,8 +41,11 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
   float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
   vec3 ambient = light.ambient * vec3(1.0, 1.0, 0.0);
-  vec3 diffuse = light.diffuse * diff * vec3(0.8, 0.4, 0.0);
-  vec3 specular = light.specular * spec * vec3(1.0, 1.0, 1.0);
+  vec3 diffuse = light.diffuse * diff *
+                 vec3(texture(material.texture_diffuse1, TexCoords)) *
+                 material.diffuseColor;
+  vec3 specular = light.specular * spec *
+                  vec3(texture(material.texture_specular1, TexCoords));
 
   return (ambient + diffuse + specular);
 }

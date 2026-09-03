@@ -9,6 +9,7 @@ set(SOURCE_FILES
     src/renderer/glad.c
     src/renderer/cylinder.cpp
     src/renderer/mesh.cpp
+    src/renderer/model.cpp
     src/physics/particle.cpp
     src/physics/pcontacts.cpp
     src/physics/pfgen.cpp
@@ -23,8 +24,8 @@ endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-include_directories(include PRIVATE external/glm external/imgui
-                    external/imgui/backends)
+include_directories(include external/glm external/imgui external/imgui/backends
+                    external)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
@@ -57,8 +58,8 @@ target_link_libraries(imgui PUBLIC glfw)
 
 add_executable(stingray ${SOURCE_FILES})
 target_compile_options(
-  stingray PRIVATE $<$<CONFIG:Debug>:-fsanitize=address,undefined
-                   -fno-omit-frame-pointer -g>)
+  stingray PRIVATE $<$<CONFIG:Debug>: -Wall -Wshadow
+                   -fsanitize=address,undefined -fno-omit-frame-pointer -g>)
 target_link_options(stingray PRIVATE
                     $<$<CONFIG:Debug>:-fsanitize=address,undefined>)
 

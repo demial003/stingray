@@ -77,8 +77,8 @@ void ParticleContact::resolveInterpenetration(real duration) {
 
 ParticleContactResolver::ParticleContactResolver(unsigned iterations)
     : iterations(iterations) {};
-void ParticleContactResolver::setIterations(unsigned iterations) {
-  ParticleContactResolver::iterations = iterations;
+void ParticleContactResolver::setIterations(unsigned iter) {
+  ParticleContactResolver::iterations = iter;
 }
 
 void ParticleContactResolver::resolveContacts(ParticleContact *contactArray,
