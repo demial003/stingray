@@ -38,7 +38,9 @@ extern "C" const char *__lsan_default_suppressions() {
          "leak:libglfw\n";
 }
 
-float initialTheta = glm::radians(0.0f);
+float initialTheta = glm::radians(100.0f);
+
+bool showWireframe = false;
 
 stingray::renderer::Sphere sphere = stingray::renderer::Sphere(100, 100);
 stingray::renderer::Cylinder cylinder = stingray::renderer::Cylinder(100, 5);
@@ -182,7 +184,13 @@ void processInput(GLFWwindow *window) {
   }
 
   if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    if (!showWireframe) {
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      showWireframe = true;
+    } else {
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      showWireframe = false;
+    }
   }
 
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
