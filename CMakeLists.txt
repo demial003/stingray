@@ -45,6 +45,12 @@ add_library(
   ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
   ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp)
 
+set(ASSIMP_BUILD_SAMPLES
+    OFF
+    CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ZLIB
+    ON
+    CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_TESTS
     OFF
     CACHE BOOL "" FORCE)
@@ -57,11 +63,15 @@ target_include_directories(imgui PUBLIC ${IMGUI_DIR} ${IMGUI_DIR}/backends)
 target_link_libraries(imgui PUBLIC glfw)
 
 add_executable(stingray ${SOURCE_FILES})
-target_compile_options(
-  stingray PRIVATE $<$<CONFIG:Debug>: -Wall -Wshadow
-                   -fsanitize=address,undefined -fno-omit-frame-pointer -g>)
-target_link_options(stingray PRIVATE
-                    $<$<CONFIG:Debug>:-fsanitize=address,undefined>)
+option(ENABLE_SANITIZERS "Build with ASan/UBSan" ON)
+
+target_compile_options(stingray PRIVATE $<$<CONFIG:Debug>:-Wall -Wshadow -g>)
+
+if(ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_options(stingray PRIVATE -fsanitize=address,undefined
+                                          -fno-omit-frame-pointer)
+  target_link_options(stingray PRIVATE -fsanitize=address,undefined)
+endif()
 
 target_link_libraries(stingray OpenGL::GL glfw imgui assimp)
 

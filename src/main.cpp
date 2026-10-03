@@ -313,6 +313,7 @@ int main(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+  bool show = true;
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
@@ -323,20 +324,21 @@ int main(void) {
     world.startFrame();
     world.runPhysics(1.0 / 60.0);
 
-    // ImGui::ShowDemoWindow(&show);
-
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // ImGui_ImplOpenGL3_NewFrame();
-    // ImGui_ImplGlfw_NewFrame();
-    // ImGui::NewFrame();
-    // ImGui::Begin("Controls");
-    // ImGui::Text("viewport=%d,%d,%d,%d\n", vp[0], vp[1], vp[2], vp[3]);
-    // ImGui::Text(
-    //     "dist=%.3f",
-    //     (b.particle.getPosition() - r.particle.getPosition()).magnitude());
-    // ImGui::End();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::ShowDemoWindow(&show);
+    ImGui::Begin("Controls");
+    ImGui::Text(
+        "dist=%.3f",
+        (b.particle.getPosition() - r.particle.getPosition()).magnitude());
+    ImGui::SliderFloat("gravity", (GRAVITY.getY()), -20.0f, 0.0f, "%.4f");
+    ImGui::End();
+    std::cout << GRAVITY.y << "\n";
 
     glm::mat4 view = camera.getViewMatrix();
 
@@ -389,8 +391,8 @@ int main(void) {
     lightShader.setMat4("model", model);
     lightSphere.Draw(lightShader);
 
-    // ImGui::Render();
-    // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);
     glfwWaitEventsTimeout(1.0 / 60.0);

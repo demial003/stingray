@@ -1,4 +1,5 @@
 build/
+build-rd/
 compile_commands.json
 .cache
 .DS_Store

@@ -91,6 +91,7 @@ public:
     }
   }
 
+  float *getY() { return &y; };
   void clear() { x = y = z = 0.0f; }
 
 private:

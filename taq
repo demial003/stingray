@@ -1,0 +1,434 @@
+[33mcommit d26735814aa6ed55e86dcf4d513e6972b66b0d73[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Oct 2 19:59:13 2026 -0400
+
+    remove renderdoc build dir
+
+[33mcommit 587b020067ce3e23b485f2c368a835b9f2b58cd0[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Oct 2 19:57:51 2026 -0400
+
+    setup imgui and add slider to adjust gravity
+
+[33mcommit 477b8e24ec771b1b45872809088986a41b7e8169[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Oct 2 18:28:17 2026 -0400
+
+    sync with remote
+
+[33mcommit eb806280705488975388fb5ae45b8b332361b938[m
+Author: demial003 <demial003@gmail.com>
+Date:   Wed Sep 2 23:05:11 2026 -0400
+
+    gitattributes
+
+[33mcommit 2e440fe7dac5f9ba9ba40c93551e1bd7d6b17213[m
+Author: demial003 <demial003@gmail.com>
+Date:   Wed Sep 2 22:56:37 2026 -0400
+
+    add wireframe toggle
+
+[33mcommit 7a409fe1c71ffb48461c9e53c10143e740ce37db[m
+Author: demial003 <demial003@gmail.com>
+Date:   Wed Sep 2 22:46:30 2026 -0400
+
+    extended shader material system for assimp loaded models
+
+[33mcommit 906ec8a8f9ede75cb9b04abd1c96862c7ad942b6[m
+Author: demial003 <demial003@gmail.com>
+Date:   Wed Sep 2 16:50:15 2026 -0400
+
+    refactor mesh class to support assimp model loading
+
+[33mcommit d86234f2baccd4b32bf793154345a2d693638179[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Aug 28 16:48:38 2026 -0400
+
+    refactor namespaces and directory structure
+
+[33mcommit 44ed3a01e3ac55d386d3043548637451aa34bd86[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Aug 28 16:41:04 2026 -0400
+
+    refactor namespaces and directory structure
+
+[33mcommit 8d36a96245c4f3d17bbbefe59098bfdaf089ebe7[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Aug 28 14:38:40 2026 -0400
+
+    build assimp statically
+
+[33mcommit 6e9e8fa9dbca807a0453901c991fda0ebbcec84c[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Aug 28 13:26:34 2026 -0400
+
+    assimp submodule
+
+[33mcommit 459abf6b400c16c4416491496c1857a0b78e68c1[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Aug 27 18:18:15 2026 -0400
+
+    git attributes
+
+[33mcommit 1d8a6891060e4e4e039221f52e57d3836a5bdece[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Aug 27 18:17:00 2026 -0400
+
+    git attributes
+
+[33mcommit 19766e1ebab83414e529d73a3129859ea2923301[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Aug 27 18:15:16 2026 -0400
+
+    add git attributes to ignore some files
+
+[33mcommit daa68010fc92e7591e7d4fd0c271f6c3256ea6d2[m[33m ([m[1;33mtag: [m[1;33mv0.1-pendulum[m[33m)[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Aug 27 18:06:58 2026 -0400
+
+    update README
+
+[33mcommit b5f6030e6c9d61973ce39da0d0a149d996907947[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Aug 27 17:46:11 2026 -0400
+
+    remove moire patterns from grid
+
+[33mcommit 4867a46fe5a0574f8eccfb508efbd9872b33c2c1[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Aug 27 16:38:49 2026 -0400
+
+    simple grid shader for structure
+
+[33mcommit aab0b8dc02c5a57bb007e81e3e5c1f7df26b9364[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Jul 23 18:09:59 2026 -0400
+
+    asan suppressions added
+
+[33mcommit a4fc1bd9895bd66cdf772bfd75f4d30b3f4d4e96[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Jul 23 17:59:21 2026 -0400
+
+    remove fsan from compile options
+
+[33mcommit 0da1b88dc63be181d4be485c1eb77647539c607b[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Jul 23 17:58:19 2026 -0400
+
+    fix cmakelists
+
+[33mcommit 00566f7ed513717a3f3161ee3394f9340821999b[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Jul 23 17:50:01 2026 -0400
+
+    sync with linux
+
+[33mcommit 87c4d22a24ed613bbb2a14b6cbdfffd519a5a584[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Jul 23 16:05:48 2026 -0400
+
+    change directory structure
+
+[33mcommit 63f87bb1d6bd9485dadca6f5ad8aad3ccd3f3689[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Jul 23 15:30:07 2026 -0400
+
+    Add glm as submodule
+
+[33mcommit c332dea373acbbf0d7f5b0fab037258cd34f2f91[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Jul 23 15:26:54 2026 -0400
+
+    Remove vendored glm
+
+[33mcommit aee00f4ff0d74b4773c1d42a21d210aea3495f5f[m
+Author: demial003 <demial003@gmail.com>
+Date:   Sun Jul 19 01:10:32 2026 -0400
+
+    decouple physics and rendering
+
+[33mcommit 93890e2653b74d307407722a45f5e257ea7c32d6[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Jul 17 19:31:37 2026 -0400
+
+    implement directional light
+
+[33mcommit 40971196d3fb9f5c6144d4f535cbac0f0f3ea946[m
+Author: demial003 <demial003@gmail.com>
+Date:   Tue Jul 14 16:23:08 2026 -0400
+
+    improving const correctness
+
+[33mcommit 8ae967a3825ba610146c7032ed40da226c330954[m
+Merge: 361ad9c 5942df0
+Author: Demi Alao <63688078+demial003@users.noreply.github.com>
+Date:   Mon Jul 13 23:53:17 2026 -0400
+
+    Merge pull request #1 from demial003/linux
+    
+    Linux
+
+[33mcommit 361ad9c4a2658651e6f67dd881dbc40ba329ebdf[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jul 13 23:50:13 2026 -0400
+
+    mac branch
+
+[33mcommit da5a9706b781690f416a2fae1e7f16ea9be51c74[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jul 13 23:48:53 2026 -0400
+
+    syncing
+
+[33mcommit 5942df006a8df4eeea2c51c0bbf5ef33fc8e6034[m[33m ([m[1;31morigin/linux[m[33m, [m[1;32mlinux[m[33m)[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jul 13 23:47:30 2026 -0400
+
+    renderdoc debugging
+
+[33mcommit a098085bc2f67765aeba6dcd527a7ccfc5bdbb41[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jul 13 23:41:01 2026 -0400
+
+    renderdoc bug
+
+[33mcommit 4ad0834f6bf845a698278008c0db59214acf389c[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jul 13 23:36:45 2026 -0400
+
+    renderdoc bug fix
+
+[33mcommit 56e711cb7110844fa91d113b74ac82a4437e3305[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jul 13 23:34:36 2026 -0400
+
+    renderdoc bug fix
+
+[33mcommit 28df89be0003c0f3eed539c958f0e560f444804e[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jul 13 23:31:16 2026 -0400
+
+    syncing
+
+[33mcommit 4f219dfd39f2565d7665cd43b40f1d5f308e1cf3[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jul 13 16:53:52 2026 -0400
+
+    syncing
+
+[33mcommit 04e91958c46b6f7f73beeab3a26e75554ce13b29[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jul 13 15:09:29 2026 -0400
+
+    rod swinging
+
+[33mcommit 35ec583e4b7735dbca361981ae614006ba1a2391[m
+Author: demial003 <demial003@gmail.com>
+Date:   Tue Jul 7 16:44:54 2026 -0400
+
+    still debuggin
+
+[33mcommit 624dd384c1f90e4ee0720d66126240065a5129c8[m
+Author: demial003 <demial003@gmail.com>
+Date:   Tue Jul 7 16:12:13 2026 -0400
+
+    debugging imgui implementation
+
+[33mcommit 01a52e5372842add3bd94f2c19d55470239f8b97[m
+Author: demial003 <demial003@gmail.com>
+Date:   Tue Jun 30 14:31:46 2026 -0400
+
+    remove .DS_Store from repo
+
+[33mcommit 16d42df30ae904a116f2b3698b89feda066eee44[m
+Author: demial003 <demial003@gmail.com>
+Date:   Tue Jun 30 14:30:25 2026 -0400
+
+    remove .cache from repo
+
+[33mcommit cc13a0b905393bdc00908fb36961baba1ced9bc9[m
+Author: demial003 <demial003@gmail.com>
+Date:   Tue Jun 30 14:29:58 2026 -0400
+
+    remove .cache from repo
+
+[33mcommit b2704b7aa46befccf1d9029bdaeee7dbd4155780[m
+Author: demial003 <demial003@gmail.com>
+Date:   Tue Jun 30 14:28:11 2026 -0400
+
+    add imgui submodule
+
+[33mcommit 02a530c3fb8664c834b2f299ce02efff12512ca7[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jun 29 16:22:06 2026 -0400
+
+    complete rod constraint, bob moving as expected
+
+[33mcommit 344a8f7d2d4d10a42a76d9d81286bceb5488c390[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jun 29 15:49:31 2026 -0400
+
+    working on contacts
+
+[33mcommit cf6266237c14561a4888c3f9c35588d709fe5a32[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jun 29 15:29:42 2026 -0400
+
+    still working on contacts
+
+[33mcommit f609aebae24ec934da602120fe6e8f96de16ec3a[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jun 29 15:01:17 2026 -0400
+
+    working on contact detection
+
+[33mcommit 96db2c36bdc5974c9c3682dc0ec4e1d28937c17f[m
+Author: demial003 <demial003@gmail.com>
+Date:   Tue Jun 23 23:55:18 2026 -0400
+
+    add debug flags for debug mode
+
+[33mcommit 2debe3472743657f018bd4c6b0442c2e7a594c91[m
+Author: demial003 <demial003@gmail.com>
+Date:   Tue Jun 23 18:05:57 2026 -0400
+
+    fix gravity update timing bug
+
+[33mcommit ef4f4e41deb1cd9861ecea67a429345d51b1fd63[m
+Author: demial003 <demial003@gmail.com>
+Date:   Tue Jun 23 14:40:43 2026 -0400
+
+    sphere falling due to gravity
+
+[33mcommit 3ba635fe2379d077126da1ccf5193b1ae6672811[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jun 22 23:46:26 2026 -0400
+
+    add cable and rod contacts in physics engine
+
+[33mcommit 06db1329cdb42f9f3b3e58828f091ab7c8e53b73[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jun 22 19:39:49 2026 -0400
+
+    position meshes to pendulum position
+
+[33mcommit 0d58545eda22de4ce256fe73724c12eefdf6ac59[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jun 22 16:54:24 2026 -0400
+
+    add particle force generators
+
+[33mcommit 84664ea9deb6cd75442138ce6e304de68a5fb821[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jun 22 15:37:06 2026 -0400
+
+    create mesh class to control mesh rendering
+
+[33mcommit 4cec8fafe490d5cbe96654d872da14bb504e6d03[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jun 22 15:21:02 2026 -0400
+
+    refactor rendering code
+
+[33mcommit a03cf1e2bae431342c2e90423f692c7d94c4fda1[m
+Author: demial003 <demial003@gmail.com>
+Date:   Mon Jun 22 12:34:05 2026 -0400
+
+    generate rod as cylinder
+
+[33mcommit 88806153a16fd0c563b43467f3f87ba8609d8757[m
+Author: demial003 <demial003@gmail.com>
+Date:   Sun Jun 21 00:34:00 2026 -0400
+
+    sphere procedural mesh in progress
+
+[33mcommit 16c204ff97544e13bb2113151e692534cc3a86a7[m
+Author: demial003 <demial003@gmail.com>
+Date:   Sat Jun 20 18:52:34 2026 -0400
+
+    syncing
+
+[33mcommit d9ee41b2c0fc170a48c84d3f31df219c0d39585d[m
+Author: demial003 <demial003@gmail.com>
+Date:   Sat Jun 20 18:50:31 2026 -0400
+
+    stop tracking build directory
+
+[33mcommit 886bcf8230d92982428e94fe87481f12eff91e02[m
+Author: demial003 <demial003@gmail.com>
+Date:   Sat Jun 20 18:48:21 2026 -0400
+
+    higher res sphere
+
+[33mcommit f0c189bf26a45e9e0de869cb9361c4d1f5dc7377[m
+Author: demial003 <demial003@gmail.com>
+Date:   Sat Jun 20 18:45:12 2026 -0400
+
+    final sync
+
+[33mcommit 2fd012ddeaac0b5e8727f828fc3db4d757c17664[m
+Author: demial003 <demial003@gmail.com>
+Date:   Sat Jun 20 18:41:24 2026 -0400
+
+    stop tracking build directory and generated files
+
+[33mcommit c44ad028ab49730d67079112c876956022e47884[m
+Author: demial003 <demial003@gmail.com>
+Date:   Sat Jun 20 18:37:37 2026 -0400
+
+    higher res sphere
+
+[33mcommit dc5570585028dc56146982e1a1e95dc917f586c4[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Jun 19 17:54:14 2026 -0400
+
+    procedurally generate UV sphere
+
+[33mcommit bd1a66d43c65d379fc6d757a448e6f70a7c2facc[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Jun 19 16:31:57 2026 -0400
+
+    close perchance
+
+[33mcommit 5da18c3a33443de50f1d2c83c78bd53e148f603c[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Jun 19 16:16:18 2026 -0400
+
+    almost done with sphere maybe
+
+[33mcommit 1b4ef43aa0c3b3bc6d7afc3617c0dca018713bdc[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Jun 19 14:47:17 2026 -0400
+
+    progress
+
+[33mcommit 6aaf3c32271ef95026aa02da7214e1bb578b03fb[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Jun 19 14:46:22 2026 -0400
+
+    making some progress
+
+[33mcommit 4688548525528632764131e6b858a1884f05e7e6[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Jun 19 13:56:29 2026 -0400
+
+    working on sphere gen
+
+[33mcommit fc51e035670e9fab33de06d320084013abfefa11[m
+Author: demial003 <demial003@gmail.com>
+Date:   Fri Jun 19 13:55:51 2026 -0400
+
+    working on sphere generation
+
+[33mcommit 26dba1254f85966fd69f7e40f48d3498ef35e21d[m
+Author: demial003 <demial003@gmail.com>
+Date:   Thu Jun 18 16:39:30 2026 -0400
+
+    reorganizing
+
+[33mcommit 42226a6af5a6dbe044d8b7c27e686fec98eb7ced[m
+Author: demial003 <demial003@gmail.com>
+Date:   Tue Jun 16 17:00:35 2026 -0400
+
+    Inital commit
