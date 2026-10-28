@@ -10,7 +10,6 @@ public:
 
   virtual void genVertices() override;
 
-private:
   int slices;
   int stacks;
   unsigned int getVertexNumber(int i, int j) const;

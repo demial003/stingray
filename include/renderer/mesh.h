@@ -6,6 +6,7 @@
 
 namespace stingray {
 namespace renderer {
+
 struct Vertex {
   glm::vec3 Position;
   glm::vec3 Normal;
@@ -69,8 +70,8 @@ public:
 protected:
   void setupMesh();
 
-  unsigned int VBO = 0;
   unsigned int VAO = 0;
+  unsigned int VBO = 0;
   unsigned int EBO = 0;
 
   unsigned int vertPosLoc = 0;

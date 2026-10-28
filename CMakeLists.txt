@@ -45,6 +45,9 @@ add_library(
   ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
   ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp)
 
+set(ASSIMP_BUILD_ZLIB
+    OFF
+    CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_SAMPLES
     OFF
     CACHE BOOL "" FORCE)

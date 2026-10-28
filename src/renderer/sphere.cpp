@@ -19,20 +19,6 @@ void Sphere::genVertices() {
 
       vertices.push_back(
           Vertex{glm::vec3(x, y, z), glm::vec3(x, y, z), glm::vec2(s, t)});
-
-      // int vertNumber = getVertexNumber(i, j);
-      //
-      // float *basePtr = vboIdx + vertNumber * 8;
-      // *(basePtr++) = x;
-      // *(basePtr++) = y;
-      // *(basePtr++) = z;
-      //
-      // *(basePtr++) = x;
-      // *(basePtr++) = y;
-      // *(basePtr++) = z;
-      //
-      // *(basePtr++) = float(i % slices) / (float)slices;
-      // *(basePtr++) = (float)j / (float)stacks;
     }
   }
 

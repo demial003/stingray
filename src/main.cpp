@@ -314,6 +314,7 @@ int main(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   bool show = true;
+  float shininess = 64.0f;
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
@@ -321,6 +322,7 @@ int main(void) {
 
     processInput(window);
 
+    b.particle.setAcceleration(GRAVITY);
     world.startFrame();
     world.runPhysics(1.0 / 60.0);
 
@@ -331,14 +333,11 @@ int main(void) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::ShowDemoWindow(&show);
     ImGui::Begin("Controls");
-    ImGui::Text(
-        "dist=%.3f",
-        (b.particle.getPosition() - r.particle.getPosition()).magnitude());
     ImGui::SliderFloat("gravity", (GRAVITY.getY()), -20.0f, 0.0f, "%.4f");
+    ImGui::SliderFloat("shininess", &shininess, 0.0f, 128.0f, "%.4f");
     ImGui::End();
-    std::cout << GRAVITY.y << "\n";
+    // std::cout << GRAVITY.y << "\n";
 
     glm::mat4 view = camera.getViewMatrix();
 
@@ -362,7 +361,7 @@ int main(void) {
     shader.setMat4("projection", projection);
     // shader.setVec3("diffuseColor", glm::vec3(0.8f, 0.5f, 0.2f));
     shader.setVec3("viewPos", camera.position);
-    shader.setFloat("material.shininess", 32.0f);
+    shader.setFloat("material.shininess", shininess);
 
     glm::vec3 lightPos(5.0f, 5.0f, 7.0f);
 
