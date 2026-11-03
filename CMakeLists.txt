@@ -10,6 +10,7 @@ set(SOURCE_FILES
     src/renderer/cylinder.cpp
     src/renderer/mesh.cpp
     src/renderer/model.cpp
+    src/renderer/quad.cpp
     src/physics/particle.cpp
     src/physics/pcontacts.cpp
     src/physics/pfgen.cpp

@@ -19,6 +19,7 @@
 #include <renderer/cylinder.h>
 #include <renderer/mesh.h>
 #include <renderer/model.h>
+#include <renderer/quad.h>
 #include <renderer/shader.h>
 #include <renderer/sphere.h>
 
@@ -45,11 +46,12 @@ bool showWireframe = false;
 stingray::renderer::Sphere sphere = stingray::renderer::Sphere(100, 100);
 stingray::renderer::Cylinder cylinder = stingray::renderer::Cylinder(100, 5);
 stingray::renderer::Sphere lightSphere(10, 10);
+stingray::renderer::Quad grid(100, 100);
 
 stingray::physics::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
-unsigned int gridVBO;
 unsigned int gridVAO;
+unsigned int gridVBO;
 
 struct Bob {
   stingray::physics::Particle particle;
@@ -100,6 +102,7 @@ void setupGrid() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 }
+
 void drawBob(stingray::physics::Vec3 position,
              stingray::renderer::Shader &shader) {
   glm::mat4 model(1.0f);
@@ -270,6 +273,8 @@ int main(void) {
   sphere.genVertices();
   cylinder.genVertices();
   lightSphere.genVertices();
+  grid.genVertices();
+  grid.drawMode = GL_TRIANGLE_FAN;
 
   r.rod.particle[0] = &r.particle;
   r.rod.particle[1] = &b.particle;
@@ -313,7 +318,6 @@ int main(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-  bool show = true;
   float shininess = 64.0f;
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
@@ -337,7 +341,6 @@ int main(void) {
     ImGui::SliderFloat("gravity", (GRAVITY.getY()), -20.0f, 0.0f, "%.4f");
     ImGui::SliderFloat("shininess", &shininess, 0.0f, 128.0f, "%.4f");
     ImGui::End();
-    // std::cout << GRAVITY.y << "\n";
 
     glm::mat4 view = camera.getViewMatrix();
 
@@ -346,7 +349,7 @@ int main(void) {
         glm::perspective((glm::radians(camera.zoom)),
                          (float)fbWidth / (float)fbHeight, 0.1f, 100.0f);
 
-    glBindVertexArray(gridVAO);
+    // glBindVertexArray(gridVAO);
     gridShader.use();
     gridShader.setMat4("view", view);
     gridShader.setMat4("projection", projection);
@@ -354,12 +357,12 @@ int main(void) {
     gridModel = glm::translate(gridModel, glm::vec3(0.0f, -3.0f, 0.0f));
     gridModel = glm::scale(gridModel, glm::vec3(50.0f, 1.0f, 50.0f));
     gridShader.setMat4("model", gridModel);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    grid.Draw(shader);
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
 
     shader.use();
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
-    // shader.setVec3("diffuseColor", glm::vec3(0.8f, 0.5f, 0.2f));
     shader.setVec3("viewPos", camera.position);
     shader.setFloat("material.shininess", shininess);
 
@@ -370,14 +373,14 @@ int main(void) {
     shader.setVec3("dirLight.diffuse", 0.5f, 0.5f, 0.5f);
     shader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
 
-    glm::mat4 bagModel(1.0f);
-    bagModel = glm::translate(bagModel, glm::vec3(20.0f, 0.0f, 4.0f));
-    shader.setMat4("model", bagModel);
-    shader.setVec3("material.diffuseColor", glm::vec3(0.8f, 0.5f, 0.2f));
-    bag.Draw(shader);
+    // glm::mat4 bagModel(1.0f);
+    // bagModel = glm::translate(bagModel, glm::vec3(20.0f, 0.0f, 4.0f));
+    // shader.setMat4("model", bagModel);
+    // shader.setVec3("material.diffuseColor", glm::vec3(0.8f, 0.5f, 0.2f));
+    // bag.Draw(shader);
 
-    shader.setVec3("material.diffuseColor", glm::vec3(1.0f));
-    renderScene(shader, fbWidth, fbHeight);
+    // shader.setVec3("material.diffuseColor", glm::vec3(1.0f));
+    // renderScene(shader, fbWidth, fbHeight);
 
     lightShader.use();
 

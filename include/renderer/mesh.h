@@ -67,7 +67,6 @@ public:
 
   virtual void Draw(Shader &shader);
 
-protected:
   void setupMesh();
 
   unsigned int VAO = 0;
