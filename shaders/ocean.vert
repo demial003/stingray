@@ -18,6 +18,7 @@ uniform float uTime;
 uniform float wavelength;
 uniform float amp;
 uniform float speed;
+uniform float steepness;
 uniform vec2 dir;
 
 void main(){
@@ -26,8 +27,14 @@ void main(){
 	float k = 2.0;
 	float freq = 2.0 * pi / wavelength;
 	float phase = speed * freq;
-	float s = sin(dot(dir, (vec2(FragPos.xz))) * freq + uTime * phase) + 1;
-	float c = cos(dot(dir, (vec2(FragPos.xz))) * freq + uTime * phase);
+	float s = sin(dot(dir, (FragPos.xz)) * freq + uTime * phase) + 1;
+	float c = cos(dot(dir, (FragPos.xz)) * freq + uTime * phase);
+
+	float q = steepness / (freq * amp);
+
+	float x = q * amp * dir.x * c;
+	float y = amp * s;
+	float z = q * amp * dir.y * c;
 
 	float waveHeight = 2.0 * amp * pow(s/2.0, k);
 
@@ -40,7 +47,8 @@ void main(){
 	vec3 norm = cross(binormal, tangent);
 		
 
-	FragPos = vec3(FragPos.x, FragPos.y += waveHeight, FragPos.z);
+	// FragPos = vec3(FragPos.x, FragPos.y += waveHeight, FragPos.z);
+	FragPos = vec3(FragPos.x += x, FragPos.y += y, FragPos.z += z);
 	Normal = norm;
 	TexCoords = aTexCoord;
 

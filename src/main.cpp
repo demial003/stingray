@@ -316,6 +316,7 @@ int main(void) {
   float wavelength = 4.0;
   float amp = 0.5;
   float speed = 1.0;
+  float steepness = 0.5;
   glm::vec2 dir(1.0, 0.0);
 
   while (!glfwWindowShouldClose(window)) {
@@ -343,9 +344,10 @@ int main(void) {
     ImGui::SliderFloat("amplitude", &amp, 0.0f, 1.0f, "%.4f");
     ImGui::SliderFloat("speed", &speed, 0.0f, 20.0f, "%.2f");
     ImGui::SliderFloat2("direction", &dir.x, -1.0f, 1.0f);
+    ImGui::SliderFloat("steepness", &steepness, 0.0f, 1.0f, "%.4f");
     ImGui::End();
 
-    glm::vec3 lightPos(-6.0f, 2.0f, 20.0f);
+    glm::vec3 lightPos(6.0f, 2.0f, 20.0f);
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 projection = glm::mat4(1.0f);
     projection =
@@ -378,7 +380,7 @@ int main(void) {
     oceanShader.setVec3("material.diffuseColor", glm::vec3(1.0f));
     oceanShader.setFloat("material.shininess", shininess);
     oceanShader.setVec3("dirLight.direction", -lightPos);
-    oceanShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+    oceanShader.setVec3("dirLight.ambient", 0.15f, 0.15f, 0.15f);
     oceanShader.setVec3("dirLight.diffuse", 0.5f, 0.5f, 0.5f);
     oceanShader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
     oceanShader.setFloat("uTime", (float)glfwGetTime());
@@ -386,6 +388,7 @@ int main(void) {
     oceanShader.setFloat("amp", amp);
     oceanShader.setFloat("speed", speed);
     oceanShader.setVec2("dir", normalDir);
+    oceanShader.setFloat("steepness", steepness);
     ocean.Draw(oceanShader);
 
     shader.use();
