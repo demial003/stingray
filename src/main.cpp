@@ -71,7 +71,7 @@ unsigned int vertPosLoc = 0;
 unsigned int vertNormLoc = 1;
 unsigned int vertTexLoc = 2;
 
-stingray::renderer::Camera camera(glm::vec3(0.0f, 9.0f, 30.0f));
+stingray::renderer::Camera camera(glm::vec3(0.0f, 4.0f, 30.0f));
 
 float lastX = SCR_WIDTH / 2.0;
 float lastY = SCR_HEIGHT / 2.0;
@@ -269,6 +269,7 @@ int main(void) {
   cylinder.genVertices();
   lightSphere.genVertices();
   grid.genVertices();
+  ocean.genVertices();
 
   r.rod.particle[0] = &r.particle;
   r.rod.particle[1] = &b.particle;
@@ -338,13 +339,13 @@ int main(void) {
     ImGui::Begin("params");
     // ImGui::SliderFloat("gravity", (GRAVITY.getY()), -20.0f, 0.0f, "%.4f");
     ImGui::SliderFloat("shininess", &shininess, 0.0f, 128.0f, "%.2f");
-    ImGui::SliderFloat("wavelength", &wavelength, 0.0f, 10.0f, "%.2f");
+    ImGui::SliderFloat("wavelength", &wavelength, 1.0f, 10.0f, "%.2f");
     ImGui::SliderFloat("amplitude", &amp, 0.0f, 1.0f, "%.4f");
     ImGui::SliderFloat("speed", &speed, 0.0f, 20.0f, "%.2f");
     ImGui::SliderFloat2("direction", &dir.x, -1.0f, 1.0f);
     ImGui::End();
 
-    glm::vec3 lightPos(5.0f, 5.0f, 7.0f);
+    glm::vec3 lightPos(-6.0f, 2.0f, 20.0f);
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 projection = glm::mat4(1.0f);
     projection =
@@ -368,6 +369,7 @@ int main(void) {
     oceanShader.use();
     oceanShader.setMat4("view", view);
     oceanShader.setMat4("projection", projection);
+    // oceanShader.setVec3("viewPos", camera.position);
     glm::mat4 oceanModel = glm::mat4(1.0);
     oceanModel = glm::translate(
         oceanModel, glm::vec3(camera.position.x, -3.0, camera.position.z));
@@ -384,7 +386,7 @@ int main(void) {
     oceanShader.setFloat("amp", amp);
     oceanShader.setFloat("speed", speed);
     oceanShader.setVec2("dir", normalDir);
-    grid.Draw(oceanShader);
+    ocean.Draw(oceanShader);
 
     shader.use();
     shader.setMat4("view", view);

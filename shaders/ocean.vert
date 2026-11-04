@@ -23,12 +23,25 @@ uniform vec2 dir;
 void main(){
 	FragPos = vec3(model * vec4(aPos, 1.0));
 
+	float k = 2.0;
 	float freq = 2.0 * pi / wavelength;
 	float phase = speed * freq;
-	float waveHeight = amp * sin(dot(dir, (vec2(FragPos.xz))) * freq + uTime * phase);
+	float s = sin(dot(dir, (vec2(FragPos.xz))) * freq + uTime * phase) + 1;
+	float c = cos(dot(dir, (vec2(FragPos.xz))) * freq + uTime * phase);
 
-	FragPos = vec3(FragPos.x, waveHeight, FragPos.z);
-	Normal = mat3(transpose(inverse(model))) * aNormal;
+	float waveHeight = 2.0 * amp * pow(s/2.0, k);
+
+	float dx = k * dir.x * freq * amp * pow(s / 2.0, k - 1.0) * c;
+	float dz = k * dir.y * freq * amp * pow(s / 2.0, k - 1.0) * c;
+
+
+	vec3 binormal = vec3(1.0, dz, 0.0);
+	vec3 tangent = vec3(0.0, dx, 1.0);
+	vec3 norm = cross(binormal, tangent);
+		
+
+	FragPos = vec3(FragPos.x, FragPos.y += waveHeight, FragPos.z);
+	Normal = norm;
 	TexCoords = aTexCoord;
 
 	 
