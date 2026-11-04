@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 
+#include <random>
 #include <stb/stb_image.h>
 
 #include <assimp/Importer.hpp>
@@ -314,13 +315,28 @@ int main(void) {
   float scale = 20.0;
   float shininess = 64.0f;
   float wavelength = 4.0;
-  float amp = 0.5;
+  float amp = 0.3;
   float speed = 1.0;
   float steepness = 0.5;
-  glm::vec2 dir(1.0, 0.0);
+  float freq = 0;
+  std::mt19937 rng(12345);
+  std::uniform_real_distribution<float> logDist(std::log(0.5), std::log(2.0f));
+  std::uniform_real_distribution<float> angleDist(-0.6f, 0.6f);
+
+  struct WaveCpu {
+    float lenRatio;
+    float angleOffset;
+  };
+  WaveCpu waves[8];
+
+  for (auto &w : waves) {
+    w.lenRatio = std::exp(logDist(rng));
+    w.angleOffset = angleDist(rng);
+  }
 
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
+    float windAngle = glm::radians(45.0);
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
@@ -342,12 +358,12 @@ int main(void) {
     ImGui::SliderFloat("shininess", &shininess, 0.0f, 128.0f, "%.2f");
     ImGui::SliderFloat("wavelength", &wavelength, 1.0f, 10.0f, "%.2f");
     ImGui::SliderFloat("amplitude", &amp, 0.0f, 1.0f, "%.4f");
-    ImGui::SliderFloat("speed", &speed, 0.0f, 20.0f, "%.2f");
-    ImGui::SliderFloat2("direction", &dir.x, -1.0f, 1.0f);
+    ImGui::SliderFloat("speed", &speed, 0.0f, 3.0f, "%.2f");
+    ImGui::SliderFloat("windAngle", &windAngle, 0.0f, 90.0f, "%.2f");
     ImGui::SliderFloat("steepness", &steepness, 0.0f, 1.0f, "%.4f");
     ImGui::End();
 
-    glm::vec3 lightPos(6.0f, 2.0f, 20.0f);
+    glm::vec3 lightPos(6.0f, 2.0f, -20.0f);
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 projection = glm::mat4(1.0f);
     projection =
@@ -365,30 +381,40 @@ int main(void) {
     // grid.Draw(gridShader);
     // glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    glm::vec2 normalDir =
-        glm::length(dir) ? glm::normalize(dir) : glm::vec2(1.0, 0.0);
-
     oceanShader.use();
     oceanShader.setMat4("view", view);
     oceanShader.setMat4("projection", projection);
-    // oceanShader.setVec3("viewPos", camera.position);
     glm::mat4 oceanModel = glm::mat4(1.0);
     oceanModel = glm::translate(
         oceanModel, glm::vec3(camera.position.x, -3.0, camera.position.z));
     oceanModel = glm::scale(oceanModel, glm::vec3(scale));
     oceanShader.setMat4("model", oceanModel);
-    oceanShader.setVec3("material.diffuseColor", glm::vec3(1.0f));
+    oceanShader.setVec3("material.diffuseColor", glm::vec3(0.0f, 0.0f, 1.0f));
     oceanShader.setFloat("material.shininess", shininess);
     oceanShader.setVec3("dirLight.direction", -lightPos);
     oceanShader.setVec3("dirLight.ambient", 0.15f, 0.15f, 0.15f);
     oceanShader.setVec3("dirLight.diffuse", 0.5f, 0.5f, 0.5f);
     oceanShader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
     oceanShader.setFloat("uTime", (float)glfwGetTime());
-    oceanShader.setFloat("wavelength", wavelength);
-    oceanShader.setFloat("amp", amp);
-    oceanShader.setFloat("speed", speed);
-    oceanShader.setVec2("dir", normalDir);
     oceanShader.setFloat("steepness", steepness);
+    oceanShader.setVec3("viewPos", camera.position);
+    oceanShader.setFloat("gravity", GRAVITY.y);
+    oceanShader.setInt("numWaves", 8);
+
+    for (int i = 0; i < 8; i++) {
+      float w1 = wavelength * waves[i].lenRatio;
+      freq = 2.0 * M_PI / w1;
+      float a = amp * waves[i].lenRatio;
+      float angle = windAngle + waves[i].angleOffset;
+      glm::vec2 d(cos(angle), sin(angle));
+      float phaseOffset = speed * sqrt(-GRAVITY.y * freq);
+      std::string p = "waves[" + std::to_string(i) + "].";
+      oceanShader.setFloat(p + "freq", freq);
+      oceanShader.setFloat(p + "amp", a);
+      oceanShader.setFloat(p + "phaseOffset", phaseOffset);
+      oceanShader.setVec2(p + "dir", d);
+    }
+
     ocean.Draw(oceanShader);
 
     shader.use();
