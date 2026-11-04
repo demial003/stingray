@@ -42,16 +42,15 @@ extern "C" const char *__lsan_default_suppressions() {
 float initialTheta = glm::radians(100.0f);
 
 bool showWireframe = false;
+bool toggleCursor = false;
 
 stingray::renderer::Sphere sphere = stingray::renderer::Sphere(100, 100);
 stingray::renderer::Cylinder cylinder = stingray::renderer::Cylinder(100, 5);
 stingray::renderer::Sphere lightSphere(10, 10);
 stingray::renderer::Quad grid(100, 100);
+stingray::renderer::Quad ocean(256, 256);
 
 stingray::physics::Vec3 GRAVITY(0.0, -9.81, 0.0);
-
-unsigned int gridVAO;
-unsigned int gridVBO;
 
 struct Bob {
   stingray::physics::Particle particle;
@@ -72,7 +71,7 @@ unsigned int vertPosLoc = 0;
 unsigned int vertNormLoc = 1;
 unsigned int vertTexLoc = 2;
 
-stingray::renderer::Camera camera(glm::vec3(0.0f, 0.0f, 20.0f));
+stingray::renderer::Camera camera(glm::vec3(0.0f, 9.0f, 30.0f));
 
 float lastX = SCR_WIDTH / 2.0;
 float lastY = SCR_HEIGHT / 2.0;
@@ -82,26 +81,6 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 unsigned int whiteTex;
-
-void setupGrid() {
-  float vertices[] = {
-      -1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f,  1.0f, 0.0f, 1.0f,
-      1.0f,  0.0f, -1.0f, -1.0f, 0.0f, -1.0f, 1.0f, 0.0f, 1.0f,
-  };
-  glGenBuffers(1, &gridVBO);
-  glGenVertexArrays(1, &gridVAO);
-  glBindVertexArray(gridVAO);
-
-  glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(vertPosLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-                        (void *)0);
-
-  glEnableVertexAttribArray(vertPosLoc);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-}
 
 void drawBob(stingray::physics::Vec3 position,
              stingray::renderer::Shader &shader) {
@@ -158,6 +137,36 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
   camera.processMouseScroll(static_cast<float>(yoffset));
 }
 
+void key_callback(GLFWwindow *window, int key, int scancode, int action,
+                  int mods) {
+  using namespace stingray::renderer;
+  if (action != GLFW_PRESS)
+    return;
+  if (key == GLFW_KEY_ESCAPE) {
+    glfwSetWindowShouldClose(window, true);
+  }
+
+  if (key == GLFW_KEY_LEFT_CONTROL) {
+    camera.toggle();
+    if (!toggleCursor) {
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      toggleCursor = true;
+    } else {
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      toggleCursor = false;
+    }
+  }
+
+  if (key == GLFW_KEY_TAB) {
+    if (!showWireframe) {
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      showWireframe = true;
+    } else {
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      showWireframe = false;
+    }
+  }
+}
 void mouse_callback(GLFWwindow *window, double xPosIn, double yPosIn) {
   float xpos = static_cast<float>(xPosIn);
   float ypos = static_cast<float>(yPosIn);
@@ -178,23 +187,6 @@ void mouse_callback(GLFWwindow *window, double xPosIn, double yPosIn) {
 }
 void processInput(GLFWwindow *window) {
   using namespace stingray::renderer;
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, true);
-  }
-
-  if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-  }
-
-  if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
-    if (!showWireframe) {
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      showWireframe = true;
-    } else {
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      showWireframe = false;
-    }
-  }
 
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     camera.processKeyboard(FORWARD, deltaTime);
@@ -260,6 +252,7 @@ int main(void) {
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glfwSetScrollCallback(window, scroll_callback);
   glfwSetCursorPosCallback(window, mouse_callback);
+  glfwSetKeyCallback(window, key_callback);
 
   stingray::renderer::Shader shader("../shaders/shader.vert",
                                     "../shaders/shader.frag");
@@ -267,6 +260,8 @@ int main(void) {
                                          "../shaders/lightShader.frag");
   stingray::renderer::Shader gridShader("../shaders/grid.vert",
                                         "../shaders/grid.frag");
+  stingray::renderer::Shader oceanShader("../shaders/ocean.vert",
+                                         "../shaders/ocean.frag");
 
   stingray::physics::ParticleWorld world(2, 4);
 
@@ -274,7 +269,6 @@ int main(void) {
   cylinder.genVertices();
   lightSphere.genVertices();
   grid.genVertices();
-  grid.drawMode = GL_TRIANGLE_FAN;
 
   r.rod.particle[0] = &r.particle;
   r.rod.particle[1] = &b.particle;
@@ -294,8 +288,6 @@ int main(void) {
   r.particle.setPosition(0.0, cylinder.getHeight(), 0.0);
   r.particle.setInverseMass(0);
   r.particle.damping = 0.99f;
-
-  setupGrid();
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -318,7 +310,13 @@ int main(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+  float scale = 20.0;
   float shininess = 64.0f;
+  float wavelength = 4.0;
+  float amp = 0.5;
+  float speed = 1.0;
+  glm::vec2 dir(1.0, 0.0);
+
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
@@ -337,36 +335,62 @@ int main(void) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("Controls");
-    ImGui::SliderFloat("gravity", (GRAVITY.getY()), -20.0f, 0.0f, "%.4f");
-    ImGui::SliderFloat("shininess", &shininess, 0.0f, 128.0f, "%.4f");
+    ImGui::Begin("params");
+    // ImGui::SliderFloat("gravity", (GRAVITY.getY()), -20.0f, 0.0f, "%.4f");
+    ImGui::SliderFloat("shininess", &shininess, 0.0f, 128.0f, "%.2f");
+    ImGui::SliderFloat("wavelength", &wavelength, 0.0f, 10.0f, "%.2f");
+    ImGui::SliderFloat("amplitude", &amp, 0.0f, 1.0f, "%.4f");
+    ImGui::SliderFloat("speed", &speed, 0.0f, 20.0f, "%.2f");
+    ImGui::SliderFloat2("direction", &dir.x, -1.0f, 1.0f);
     ImGui::End();
 
+    glm::vec3 lightPos(5.0f, 5.0f, 7.0f);
     glm::mat4 view = camera.getViewMatrix();
-
     glm::mat4 projection = glm::mat4(1.0f);
     projection =
         glm::perspective((glm::radians(camera.zoom)),
                          (float)fbWidth / (float)fbHeight, 0.1f, 100.0f);
 
     // glBindVertexArray(gridVAO);
-    gridShader.use();
-    gridShader.setMat4("view", view);
-    gridShader.setMat4("projection", projection);
-    glm::mat4 gridModel = glm::mat4(1.0);
-    gridModel = glm::translate(gridModel, glm::vec3(0.0f, -3.0f, 0.0f));
-    gridModel = glm::scale(gridModel, glm::vec3(50.0f, 1.0f, 50.0f));
-    gridShader.setMat4("model", gridModel);
-    grid.Draw(shader);
+    // gridShader.use();
+    // gridShader.setMat4("view", view);
+    // gridShader.setMat4("projection", projection);
+    // glm::mat4 gridModel = glm::mat4(1.0);
+    // gridModel = glm::translate(gridModel, glm::vec3(0.0f, -3.0f, 0.0f));
+    // gridModel = glm::scale(gridModel, glm::vec3(50.0f, 1.0f, 50.0f));
+    // gridShader.setMat4("model", gridModel);
+    // grid.Draw(gridShader);
     // glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    glm::vec2 normalDir =
+        glm::length(dir) ? glm::normalize(dir) : glm::vec2(1.0, 0.0);
+
+    oceanShader.use();
+    oceanShader.setMat4("view", view);
+    oceanShader.setMat4("projection", projection);
+    glm::mat4 oceanModel = glm::mat4(1.0);
+    oceanModel = glm::translate(
+        oceanModel, glm::vec3(camera.position.x, -3.0, camera.position.z));
+    oceanModel = glm::scale(oceanModel, glm::vec3(scale));
+    oceanShader.setMat4("model", oceanModel);
+    oceanShader.setVec3("material.diffuseColor", glm::vec3(1.0f));
+    oceanShader.setFloat("material.shininess", shininess);
+    oceanShader.setVec3("dirLight.direction", -lightPos);
+    oceanShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+    oceanShader.setVec3("dirLight.diffuse", 0.5f, 0.5f, 0.5f);
+    oceanShader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
+    oceanShader.setFloat("uTime", (float)glfwGetTime());
+    oceanShader.setFloat("wavelength", wavelength);
+    oceanShader.setFloat("amp", amp);
+    oceanShader.setFloat("speed", speed);
+    oceanShader.setVec2("dir", normalDir);
+    grid.Draw(oceanShader);
 
     shader.use();
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
     shader.setVec3("viewPos", camera.position);
     shader.setFloat("material.shininess", shininess);
-
-    glm::vec3 lightPos(5.0f, 5.0f, 7.0f);
 
     shader.setVec3("dirLight.direction", -lightPos);
     shader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
