@@ -18,6 +18,7 @@ in vec3 Normal;
 in vec2 TexCoords;
 
 uniform DirLight dirLight;
+uniform float k;
 uniform samplerCube skybox;
 uniform Material material;
 uniform vec3 viewPos;
@@ -46,9 +47,9 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
 }
 
 void main() {
-  vec3 norm = normalize(Normal);
+  vec3 normal = normalize(Normal);
   vec3 viewDir = normalize(viewPos - FragPos);
-  vec3 result = CalcDirLight(dirLight, norm, viewDir) + calcEnvironmentMap();
+  vec3 result = CalcDirLight(dirLight, normal, viewDir) + calcEnvironmentMap();
   // vec3 result = CalcDirLight(dirLight, norm, viewDir); 
   FragColor = vec4(result, 1.0);
 

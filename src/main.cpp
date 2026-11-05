@@ -369,8 +369,14 @@ int main(void) {
     float angleOffset;
   };
   WaveCpu waves[8];
+  WaveCpu textureWaves[8];
 
   for (auto &w : waves) {
+    w.lenRatio = std::exp(logDist(rng));
+    w.angleOffset = angleDist(rng);
+  }
+
+  for (auto &w : textureWaves) {
     w.lenRatio = std::exp(logDist(rng));
     w.angleOffset = angleDist(rng);
   }
@@ -440,6 +446,8 @@ int main(void) {
     oceanShader.setVec3("viewPos", camera.position);
     oceanShader.setFloat("gravity", GRAVITY.y);
     oceanShader.setInt("numWaves", 8);
+    oceanShader.setInt("numTextureWaves", 8);
+    oceanShader.setInt("k", 1);
 
     for (int i = 0; i < 8; i++) {
       float w1 = wavelength * waves[i].lenRatio;
@@ -448,7 +456,21 @@ int main(void) {
       float angle = windAngle + waves[i].angleOffset;
       glm::vec2 d(cos(angle), sin(angle));
       float phaseOffset = speed * sqrt(-GRAVITY.y * freq);
-      std::string p = "waves[" + std::to_string(i) + "].";
+      std::string p = "geometricWaves[" + std::to_string(i) + "].";
+      oceanShader.setFloat(p + "freq", freq);
+      oceanShader.setFloat(p + "amp", a);
+      oceanShader.setFloat(p + "phaseOffset", phaseOffset);
+      oceanShader.setVec2(p + "dir", d);
+    }
+
+    for (int i = 0; i < 8; i++) {
+      float w1 = wavelength * textureWaves[i].lenRatio;
+      freq = 2.0 * M_PI / w1;
+      float a = amp * textureWaves[i].lenRatio;
+      float angle = windAngle + textureWaves[i].angleOffset;
+      glm::vec2 d(cos(angle), sin(angle));
+      float phaseOffset = speed * sqrt(-GRAVITY.y * freq);
+      std::string p = "textureWaves[" + std::to_string(i) + "].";
       oceanShader.setFloat(p + "freq", freq);
       oceanShader.setFloat(p + "amp", a);
       oceanShader.setFloat(p + "phaseOffset", phaseOffset);

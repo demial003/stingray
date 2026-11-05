@@ -14,6 +14,7 @@ const int MAX_WAVES = 8;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform float k;
 uniform float uTime;
 
 struct Wave {
@@ -30,8 +31,10 @@ struct waveData {
 
 uniform float steepness;
 uniform int numWaves;
+uniform int numTextureWaves;
 
-uniform Wave[MAX_WAVES] waves;
+uniform Wave[MAX_WAVES] geometricWaves;
+uniform Wave[MAX_WAVES] textureWaves;
 
 // void sumOfSines(Wave wave){
 // 	vec3 bPos = vec3(model * vec4(aPos, 1.0));
@@ -57,21 +60,24 @@ uniform Wave[MAX_WAVES] waves;
 // 	gl_Position = projection * view * vec4(FragPos, 1.0);
 // }
 
-waveData textureWave(Wave wave, vec3 bPos){
- 	float s = sin(dot(wave.dir, bPos.xz) * wave.freq + uTime * wave.phaseOffset);
- 	float c = cos(dot(wave.dir, bPos.xz) * wave.freq + uTime * wave.phaseOffset);
- 
- 	float q = steepness / (wave.freq * wave.amp * numWaves);
- 
- 	float x = q * wave.amp * wave.dir.x * c;
- 	float y = wave.amp * s;
- 	float z = q * wave.amp * wave.dir.y * c;
+vec3 textureWave(Wave wave, vec3 bPos){
+	bPos = bPos * 0.5 + 0.5;
 
-	float wa = wave.freq * wave.amp;
-	vec3 offset = vec3(x, y, z);
-	vec3 tilt = vec3(wave.dir.x * wa * c, q * wa * s ,wave.dir.y * wa * c);
- 
-	return waveData(offset, tilt);
+	float u = dot(wave.dir, bPos.xz ) + wave.phaseOffset;
+
+	float c1 = wave.dir.x * wave.freq * wave.amp * k;
+	float c2 = wave.dir.y * wave.freq * wave.amp * k;
+	
+	float s = pow((sin(u) + 1.0) / 2.0, k - 1.0);
+	float c = k * cos(u);
+	
+	float du = c1 * s * c;
+	float dv = c2 * s * c;
+
+	vec3 binormal = vec3(1.0, du, 0.0);
+	vec3 tangent = vec3(0.0, dv, 1.0);
+
+	return normalize(cross(tangent, binormal) * 2.0 - 1.0);
 }
 
 waveData geometricWave(Wave wave, vec3 bPos){
@@ -100,9 +106,12 @@ void main(){
 	Normal = vec3(0);
 
 	for(int i = 0; i < numWaves; i++){
-		waveData data = geometricWave(waves[i], bPos);
+		waveData data = geometricWave(geometricWaves[i], bPos);
 		posSum += data.offset;
 		normalSum += data.tilt;
+	}
+	for(int i = 0; i <  numTextureWaves; i++){
+		normalSum += textureWave(textureWaves[i], bPos);
 	}
 
 	FragPos = bPos + posSum;
