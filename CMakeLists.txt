@@ -11,6 +11,7 @@ set(SOURCE_FILES
     src/renderer/mesh.cpp
     src/renderer/model.cpp
     src/renderer/quad.cpp
+    src/renderer/cube.cpp
     src/physics/particle.cpp
     src/physics/pcontacts.cpp
     src/physics/pfgen.cpp

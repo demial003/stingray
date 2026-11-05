@@ -57,7 +57,24 @@ uniform Wave[MAX_WAVES] waves;
 // 	gl_Position = projection * view * vec4(FragPos, 1.0);
 // }
 
-waveData gerstner(Wave wave, vec3 bPos){
+waveData textureWave(Wave wave, vec3 bPos){
+ 	float s = sin(dot(wave.dir, bPos.xz) * wave.freq + uTime * wave.phaseOffset);
+ 	float c = cos(dot(wave.dir, bPos.xz) * wave.freq + uTime * wave.phaseOffset);
+ 
+ 	float q = steepness / (wave.freq * wave.amp * numWaves);
+ 
+ 	float x = q * wave.amp * wave.dir.x * c;
+ 	float y = wave.amp * s;
+ 	float z = q * wave.amp * wave.dir.y * c;
+
+	float wa = wave.freq * wave.amp;
+	vec3 offset = vec3(x, y, z);
+	vec3 tilt = vec3(wave.dir.x * wa * c, q * wa * s ,wave.dir.y * wa * c);
+ 
+	return waveData(offset, tilt);
+}
+
+waveData geometricWave(Wave wave, vec3 bPos){
  	float s = sin(dot(wave.dir, bPos.xz) * wave.freq + uTime * wave.phaseOffset);
  	float c = cos(dot(wave.dir, bPos.xz) * wave.freq + uTime * wave.phaseOffset);
  
@@ -83,7 +100,7 @@ void main(){
 	Normal = vec3(0);
 
 	for(int i = 0; i < numWaves; i++){
-		waveData data = gerstner(waves[i], bPos);
+		waveData data = geometricWave(waves[i], bPos);
 		posSum += data.offset;
 		normalSum += data.tilt;
 	}

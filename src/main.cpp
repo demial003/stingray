@@ -17,6 +17,7 @@
 #include <physics/pworld.h>
 
 #include <renderer/camera.h>
+#include <renderer/cube.h>
 #include <renderer/cylinder.h>
 #include <renderer/mesh.h>
 #include <renderer/model.h>
@@ -50,6 +51,7 @@ stingray::renderer::Cylinder cylinder = stingray::renderer::Cylinder(100, 5);
 stingray::renderer::Sphere lightSphere(10, 10);
 stingray::renderer::Quad grid(100, 100);
 stingray::renderer::Quad ocean(256, 256);
+stingray::renderer::Cube skybox;
 
 stingray::physics::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
@@ -72,7 +74,7 @@ unsigned int vertPosLoc = 0;
 unsigned int vertNormLoc = 1;
 unsigned int vertTexLoc = 2;
 
-stingray::renderer::Camera camera(glm::vec3(0.0f, 4.0f, 30.0f));
+stingray::renderer::Camera camera(glm::vec3(0.0f, 0.05f, -20.0f));
 
 float lastX = SCR_WIDTH / 2.0;
 float lastY = SCR_HEIGHT / 2.0;
@@ -82,6 +84,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 unsigned int whiteTex;
+unsigned int cubeMap;
 
 void drawBob(stingray::physics::Vec3 position,
              stingray::renderer::Shader &shader) {
@@ -126,7 +129,7 @@ void drawRod(stingray::physics::Vec3 rPos, stingray::physics::Vec3 bPos,
 
   shader.setMat4("model", model);
   cylinder.Draw(shader);
-}
+};
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   if (!glfwWindowShouldClose(window)) {
@@ -220,6 +223,33 @@ void renderScene(stingray::renderer::Shader &shader, int fbWidth,
   drawBob(b.particle.getPosition(), shader);
 }
 
+unsigned int loadCubemap(std::vector<std::string> faces) {
+  unsigned int textureID;
+  glGenTextures(1, &textureID);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+  int width, height, nrChannels;
+  for (unsigned int i = 0; i < faces.size(); i++) {
+    unsigned char *data =
+        stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+    if (data) {
+      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height,
+                   0, GL_RGB, GL_UNSIGNED_BYTE, data);
+      stbi_image_free(data);
+    } else {
+      std::cout << "Cubemap tex failed to load at path: " << faces[i]
+                << std::endl;
+      stbi_image_free(data);
+    }
+  }
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+  return textureID;
+}
 int main(void) {
   GLFWwindow *window;
   glfwInit();
@@ -244,9 +274,9 @@ int main(void) {
   int fbWidth, fbHeight;
   glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
   glViewport(0, 0, fbWidth, fbHeight);
-  glDepthFunc(GL_LEQUAL);
   glCullFace(GL_BACK);
   glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);
   glEnable(GL_CULL_FACE);
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -263,6 +293,8 @@ int main(void) {
                                         "../shaders/grid.frag");
   stingray::renderer::Shader oceanShader("../shaders/ocean.vert",
                                          "../shaders/ocean.frag");
+  stingray::renderer::Shader skyboxShader("../shaders/skybox.vert",
+                                          "../shaders/skybox.frag");
 
   stingray::physics::ParticleWorld world(2, 4);
 
@@ -271,6 +303,13 @@ int main(void) {
   lightSphere.genVertices();
   grid.genVertices();
   ocean.genVertices();
+  skybox.genVertices();
+
+  std::vector<std::string> faces{
+      "../assets/qwantani-cubemap/px.png", "../assets/qwantani-cubemap/nx.png",
+      "../assets/qwantani-cubemap/py.png", "../assets/qwantani-cubemap/ny.png",
+      "../assets/qwantani-cubemap/pz.png", "../assets/qwantani-cubemap/nz.png"};
+  cubeMap = loadCubemap(faces);
 
   r.rod.particle[0] = &r.particle;
   r.rod.particle[1] = &b.particle;
@@ -312,13 +351,15 @@ int main(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-  float scale = 20.0;
+  float scale = 200.0;
   float shininess = 64.0f;
   float wavelength = 4.0;
-  float amp = 0.3;
+  float amp = 0.1;
   float speed = 1.0;
   float steepness = 0.5;
   float freq = 0;
+  float windAngle = glm::radians(225.0);
+
   std::mt19937 rng(12345);
   std::uniform_real_distribution<float> logDist(std::log(0.5), std::log(2.0f));
   std::uniform_real_distribution<float> angleDist(-0.6f, 0.6f);
@@ -336,7 +377,6 @@ int main(void) {
 
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
-    float windAngle = glm::radians(45.0);
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
@@ -359,11 +399,11 @@ int main(void) {
     ImGui::SliderFloat("wavelength", &wavelength, 1.0f, 10.0f, "%.2f");
     ImGui::SliderFloat("amplitude", &amp, 0.0f, 1.0f, "%.4f");
     ImGui::SliderFloat("speed", &speed, 0.0f, 3.0f, "%.2f");
-    ImGui::SliderFloat("windAngle", &windAngle, 0.0f, 90.0f, "%.2f");
+    ImGui::SliderAngle("wind angle", &windAngle, 0.0f, 360.0f);
     ImGui::SliderFloat("steepness", &steepness, 0.0f, 1.0f, "%.4f");
     ImGui::End();
 
-    glm::vec3 lightPos(6.0f, 2.0f, -20.0f);
+    glm::vec3 lightPos(6.0f, 2.0f, 50.0f);
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 projection = glm::mat4(1.0f);
     projection =
@@ -385,14 +425,14 @@ int main(void) {
     oceanShader.setMat4("view", view);
     oceanShader.setMat4("projection", projection);
     glm::mat4 oceanModel = glm::mat4(1.0);
-    oceanModel = glm::translate(
-        oceanModel, glm::vec3(camera.position.x, -3.0, camera.position.z));
+    oceanModel = glm::translate(oceanModel, glm::vec3(0.0, -3.0, 0.0));
     oceanModel = glm::scale(oceanModel, glm::vec3(scale));
     oceanShader.setMat4("model", oceanModel);
-    oceanShader.setVec3("material.diffuseColor", glm::vec3(0.0f, 0.0f, 1.0f));
+    oceanShader.setVec3("material.diffuseColor",
+                        glm::vec3(0.05f, 0.20f, 0.30f));
     oceanShader.setFloat("material.shininess", shininess);
     oceanShader.setVec3("dirLight.direction", -lightPos);
-    oceanShader.setVec3("dirLight.ambient", 0.15f, 0.15f, 0.15f);
+    oceanShader.setVec3("dirLight.ambient", 0.35f, 0.35f, 0.35f);
     oceanShader.setVec3("dirLight.diffuse", 0.5f, 0.5f, 0.5f);
     oceanShader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
     oceanShader.setFloat("uTime", (float)glfwGetTime());
@@ -415,6 +455,8 @@ int main(void) {
       oceanShader.setVec2(p + "dir", d);
     }
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
     ocean.Draw(oceanShader);
 
     shader.use();
@@ -447,6 +489,16 @@ int main(void) {
     lightShader.setMat4("projection", projection);
     lightShader.setMat4("model", model);
     lightSphere.Draw(lightShader);
+
+    glDepthMask(GL_FALSE);
+    skyboxShader.use();
+    glm::mat4 skyboxView = glm::mat4(glm::mat3(camera.getViewMatrix()));
+    skyboxShader.setMat4("view", skyboxView);
+    skyboxShader.setMat4("projection", projection);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
+    skybox.Draw(skyboxShader);
+    glDepthMask(GL_TRUE);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
