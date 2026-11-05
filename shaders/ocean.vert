@@ -63,13 +63,13 @@ uniform Wave[MAX_WAVES] textureWaves;
 vec3 textureWave(Wave wave, vec3 bPos){
 	bPos = bPos * 0.5 + 0.5;
 
-	float u = dot(wave.dir, bPos.xz ) + wave.phaseOffset;
+	float u = dot(wave.dir, bPos.xz ) * wave.freq + uTime * wave.phaseOffset;
 
 	float c1 = wave.dir.x * wave.freq * wave.amp * k;
 	float c2 = wave.dir.y * wave.freq * wave.amp * k;
 	
 	float s = pow((sin(u) + 1.0) / 2.0, k - 1.0);
-	float c = k * cos(u);
+	float c = cos(u);
 	
 	float du = c1 * s * c;
 	float dv = c2 * s * c;
