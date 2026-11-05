@@ -17,13 +17,9 @@
 #include <physics/pworld.h>
 
 #include <renderer/camera.h>
-#include <renderer/cube.h>
-#include <renderer/cylinder.h>
 #include <renderer/mesh.h>
 #include <renderer/model.h>
-#include <renderer/quad.h>
 #include <renderer/shader.h>
-#include <renderer/sphere.h>
 
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -46,12 +42,13 @@ float initialTheta = glm::radians(100.0f);
 bool showWireframe = false;
 bool toggleCursor = false;
 
-stingray::renderer::Sphere sphere = stingray::renderer::Sphere(100, 100);
-stingray::renderer::Cylinder cylinder = stingray::renderer::Cylinder(100, 5);
-stingray::renderer::Sphere lightSphere(10, 10);
-stingray::renderer::Quad grid(100, 100);
-stingray::renderer::Quad ocean(256, 256);
-stingray::renderer::Cube skybox;
+float cylHeight = 5.0;
+stingray::renderer::Mesh sphere;
+stingray::renderer::Mesh cylinder;
+stingray::renderer::Mesh lightSphere;
+stingray::renderer::Mesh grid;
+stingray::renderer::Mesh ocean;
+stingray::renderer::Mesh skybox;
 
 stingray::physics::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
@@ -74,7 +71,7 @@ unsigned int vertPosLoc = 0;
 unsigned int vertNormLoc = 1;
 unsigned int vertTexLoc = 2;
 
-stingray::renderer::Camera camera(glm::vec3(0.0f, 0.05f, -20.0f));
+stingray::renderer::Camera camera(glm::vec3(0.0f, 0.05f, 0.0f));
 
 float lastX = SCR_WIDTH / 2.0;
 float lastY = SCR_HEIGHT / 2.0;
@@ -298,12 +295,12 @@ int main(void) {
 
   stingray::physics::ParticleWorld world(2, 4);
 
-  sphere.genVertices();
-  cylinder.genVertices();
-  lightSphere.genVertices();
-  grid.genVertices();
-  ocean.genVertices();
-  skybox.genVertices();
+  sphere.genSphere(100, 100);
+  cylinder.genCylinder(100, cylHeight);
+  lightSphere.genSphere(10, 10);
+  grid.genQuad(100, 100);
+  ocean.genQuad(256, 256);
+  skybox.genCube();
 
   std::vector<std::string> faces{
       "../assets/qwantani-cubemap/px.png", "../assets/qwantani-cubemap/nx.png",
@@ -314,19 +311,18 @@ int main(void) {
   r.rod.particle[0] = &r.particle;
   r.rod.particle[1] = &b.particle;
 
-  r.rod.length = cylinder.getHeight();
+  r.rod.length = cylHeight;
   world.getParticles().push_back(&b.particle);
   world.getParticles().push_back(&r.particle);
   world.getContactGenerators().push_back(&r.rod);
 
-  b.particle.setPosition(
-      cylinder.getHeight() * sinf(initialTheta),
-      cylinder.getHeight() + -cylinder.getHeight() * cosf(initialTheta), 0.0f);
+  b.particle.setPosition(cylHeight * sinf(initialTheta),
+                         cylHeight + -cylHeight * cosf(initialTheta), 0.0f);
   b.particle.setMass(1.0f);
   b.particle.damping = 0.99f;
   b.particle.setAcceleration(GRAVITY);
 
-  r.particle.setPosition(0.0, cylinder.getHeight(), 0.0);
+  r.particle.setPosition(0.0, cylHeight, 0.0);
   r.particle.setInverseMass(0);
   r.particle.damping = 0.99f;
 
@@ -341,7 +337,7 @@ int main(void) {
   ImGui_ImplOpenGL3_Init();
 
   stbi_set_flip_vertically_on_load(true);
-  stingray::renderer::Model bag("../assets/backpack.obj");
+  // stingray::renderer::Model bag("../assets/backpack.obj");
 
   glGenTextures(1, &whiteTex);
   glBindTexture(GL_TEXTURE_2D, whiteTex);
@@ -351,7 +347,7 @@ int main(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-  float scale = 200.0;
+  float scale = 50.0;
   float shininess = 64.0f;
   float wavelength = 4.0;
   float amp = 0.1;
@@ -359,6 +355,17 @@ int main(void) {
   float steepness = 0.5;
   float freq = 0;
   float windAngle = glm::radians(225.0);
+
+  float textureWavelength = 4.0;
+  float textureAmp = 0.1;
+  float textureSpeed = 1.0;
+  float textureFreq = 0;
+  float textureWindAngle = glm::radians(225.0);
+
+  int numWaves = 4;
+  const int maxWaves = 12;
+  int numTextureWaves = 8;
+  const int maxTextureWaves = 24;
 
   std::mt19937 rng(12345);
   std::uniform_real_distribution<float> logDist(std::log(0.5), std::log(2.0f));
@@ -368,8 +375,8 @@ int main(void) {
     float lenRatio;
     float angleOffset;
   };
-  WaveCpu waves[8];
-  WaveCpu textureWaves[8];
+  WaveCpu waves[maxWaves];
+  WaveCpu textureWaves[maxTextureWaves];
 
   for (auto &w : waves) {
     w.lenRatio = std::exp(logDist(rng));
@@ -399,14 +406,25 @@ int main(void) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("params");
-    // ImGui::SliderFloat("gravity", (GRAVITY.getY()), -20.0f, 0.0f, "%.4f");
+    ImGui::Begin("geometry params");
     ImGui::SliderFloat("shininess", &shininess, 0.0f, 128.0f, "%.2f");
     ImGui::SliderFloat("wavelength", &wavelength, 1.0f, 10.0f, "%.2f");
     ImGui::SliderFloat("amplitude", &amp, 0.0f, 1.0f, "%.4f");
     ImGui::SliderFloat("speed", &speed, 0.0f, 3.0f, "%.2f");
     ImGui::SliderAngle("wind angle", &windAngle, 0.0f, 360.0f);
     ImGui::SliderFloat("steepness", &steepness, 0.0f, 1.0f, "%.4f");
+    ImGui::SliderInt("numWaves", &numWaves, 0, maxWaves, "%d");
+    ImGui::End();
+
+    ImGui::Begin("texture params");
+    ImGui::SliderFloat("textureWavelength", &textureWavelength, 1.0f, 10.0f,
+                       "%.2f");
+    ImGui::SliderFloat("textureAmplitude", &textureAmp, 0.0f, 1.0f, "%.4f");
+    ImGui::SliderFloat("textureSpeed", &textureSpeed, 0.0f, 3.0f, "%.2f");
+    ImGui::SliderAngle("textureWind angle", &textureWindAngle, 0.0f, 360.0f);
+    ImGui::SliderFloat("textureSteepness", &steepness, 0.0f, 1.0f, "%.4f");
+    ImGui::SliderInt("numTextureWaves", &numTextureWaves, 0, maxTextureWaves,
+                     "%d");
     ImGui::End();
 
     glm::vec3 lightPos(6.0f, 2.0f, 50.0f);
@@ -435,7 +453,7 @@ int main(void) {
     oceanModel = glm::scale(oceanModel, glm::vec3(scale));
     oceanShader.setMat4("model", oceanModel);
     oceanShader.setVec3("material.diffuseColor",
-                        glm::vec3(0.05f, 0.20f, 0.30f));
+                        glm::vec3(0.02f, 0.12f, 0.12f));
     oceanShader.setFloat("material.shininess", shininess);
     oceanShader.setVec3("dirLight.direction", -lightPos);
     oceanShader.setVec3("dirLight.ambient", 0.35f, 0.35f, 0.35f);
@@ -444,12 +462,13 @@ int main(void) {
     oceanShader.setFloat("uTime", (float)glfwGetTime());
     oceanShader.setFloat("steepness", steepness);
     oceanShader.setVec3("viewPos", camera.position);
-    oceanShader.setFloat("gravity", GRAVITY.y);
-    oceanShader.setInt("numWaves", 8);
-    oceanShader.setInt("numTextureWaves", 8);
-    oceanShader.setInt("k", 1);
+    oceanShader.setInt("numWaves", numWaves);
+    oceanShader.setInt("maxWaves", maxWaves);
+    oceanShader.setInt("numTextureWaves", numTextureWaves);
+    oceanShader.setInt("maxTextureWaves", maxTextureWaves);
+    oceanShader.setFloat("k", 1.0);
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < numWaves; i++) {
       float w1 = wavelength * waves[i].lenRatio;
       freq = 2.0 * M_PI / w1;
       float a = amp * waves[i].lenRatio;
@@ -463,15 +482,15 @@ int main(void) {
       oceanShader.setVec2(p + "dir", d);
     }
 
-    for (int i = 0; i < 8; i++) {
-      float w1 = wavelength * textureWaves[i].lenRatio;
-      freq = 2.0 * M_PI / w1;
-      float a = amp * textureWaves[i].lenRatio;
-      float angle = windAngle + textureWaves[i].angleOffset;
+    for (int i = 0; i < numTextureWaves; i++) {
+      float w1 = textureWavelength * textureWaves[i].lenRatio;
+      textureFreq = 2.0 * M_PI / w1;
+      float a = textureAmp * textureWaves[i].lenRatio;
+      float angle = textureWindAngle + textureWaves[i].angleOffset;
       glm::vec2 d(cos(angle), sin(angle));
-      float phaseOffset = speed * sqrt(-GRAVITY.y * freq);
+      float phaseOffset = textureSpeed * sqrt(-GRAVITY.y * textureFreq);
       std::string p = "textureWaves[" + std::to_string(i) + "].";
-      oceanShader.setFloat(p + "freq", freq);
+      oceanShader.setFloat(p + "freq", textureFreq);
       oceanShader.setFloat(p + "amp", a);
       oceanShader.setFloat(p + "phaseOffset", phaseOffset);
       oceanShader.setVec2(p + "dir", d);
@@ -526,7 +545,8 @@ int main(void) {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);
-    glfwWaitEventsTimeout(1.0 / 60.0);
+    // glfwWaitEventsTimeout(1.0 / 60.0);
+    glfwPollEvents();
   }
 
   ImGui_ImplOpenGL3_Shutdown();

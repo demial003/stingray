@@ -61,11 +61,12 @@ public:
   Mesh(const Mesh &) = delete;
   Mesh &operator=(const Mesh &) = delete;
 
-  virtual void genVertices();
+  void genSphere(int slices, int stacks);
+  void genCylinder(int slices, float height);
+  void genQuad(int rows, int cols);
+  void genCube();
 
-  virtual int getVAO() { return VAO; };
-
-  virtual void Draw(Shader &shader);
+  void Draw(Shader &shader);
 
   void setupMesh();
 

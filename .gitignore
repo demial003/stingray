@@ -1,4 +1,6 @@
 build/
+build-debug/
+build-release/
 build-rd/
 compile_commands.json
 .cache

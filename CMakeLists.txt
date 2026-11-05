@@ -40,6 +40,15 @@ set(GLFW_BUILD_TESTS
 set(GLFW_BUILD_DOCS
     OFF
     CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT
+    OFF
+    CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT
+    OFF
+    CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_OBJ_IMPORTER
+    ON
+    CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_ZLIB
     ON
     CACHE BOOL "" FORCE)
@@ -66,6 +75,10 @@ add_library(
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR}
                                         ${imgui_SOURCE_DIR}/backends)
 target_link_libraries(imgui PUBLIC glfw)
+
+if(APPLE AND TARGET zlibstatic)
+  target_compile_definitions(zlibstatic PRIVATE fdopen=fdopen)
+endif()
 
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS src/*.cpp src/*.c)
 add_executable(stingray ${SRC})
