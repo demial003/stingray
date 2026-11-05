@@ -1,4 +1,6 @@
-utils/glad.c linguist-vendored
-include/KHR/* linguist-vendored
-include/glad/glad.h linguist-vendored
-external/stb/stb_image.h linguist-vendored
+external/** linguist-vendored
+include/KHR/** linguist-vendored
+include/glad/** linguist-vendored
+src/renderer/glad.c linguist-vendored
+
+*.h linguist-language=C++
