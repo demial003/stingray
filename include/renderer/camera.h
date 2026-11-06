@@ -9,7 +9,7 @@ namespace renderer {
 enum camera_movement { FORWARD, BACKWARD, LEFT, RIGHT, UP, DOWN };
 
 const float YAW = 90.0f;
-const float PITCH = 0.0f;
+const float PITCH = -5.0f;
 const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;

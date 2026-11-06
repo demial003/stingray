@@ -18,6 +18,7 @@ struct Texture {
   std::string type;
   std::string path;
 };
+
 class Mesh {
 
 public:
@@ -58,6 +59,7 @@ public:
     }
     return *this;
   }
+
   Mesh(const Mesh &) = delete;
   Mesh &operator=(const Mesh &) = delete;
 

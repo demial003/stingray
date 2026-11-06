@@ -83,6 +83,7 @@ void Mesh::genSphere(int slices, int stacks) {
           Vertex{glm::vec3(x, y, z), glm::vec3(x, y, z), glm::vec2(s, t)});
     }
   }
+
   auto getIdx = [slices, stacks](int i, int j) {
     return (i % slices) * (stacks + 1) + j;
   };
@@ -95,6 +96,10 @@ void Mesh::genSphere(int slices, int stacks) {
 
   for (int i = 0; i < slices; i++) {
     for (int j = 1; j < stacks - 1; j++) {
+
+      indices.push_back(getIdx(i, j));
+      indices.push_back(getIdx(i, j + 1));
+      indices.push_back(getIdx(i + 1, j));
 
       indices.push_back(getIdx(i, j + 1));
       indices.push_back(getIdx(i + 1, j + 1));
@@ -116,13 +121,21 @@ void Mesh::genCylinder(int slices, float height) {
     float x = cos(phi);
     float z = sin(phi);
 
-    float s = (float)j / float(slices);
+    float s = (float)j / (float)slices;
 
     vertices.push_back(Vertex{glm::vec3(x, -(float)height, z),
                               glm::vec3(x, 0, z),
                               glm::vec2(s, -(float)height)});
     vertices.push_back(
         Vertex{glm::vec3(x, 0, z), glm::vec3(x, 0, z), glm::vec2(s, 0.0f)});
+
+    for (int i = 0; i < slices; i++) {
+      unsigned int b0 = 2 * j;
+      unsigned int t0 = 2 * j + 1;
+      unsigned int b1 = 2 * (j + 1);
+      unsigned int t1 = 2 * (j + 1) + 1;
+      indices.insert(indices.end(), {b0, t0, b1, t0, t1, b1});
+    }
   }
   setupMesh();
 }

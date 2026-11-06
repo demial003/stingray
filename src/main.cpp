@@ -42,7 +42,8 @@ float initialTheta = glm::radians(100.0f);
 bool showWireframe = false;
 bool toggleCursor = false;
 
-float cylHeight = 5.0;
+float cylHeight = 5.0f;
+
 stingray::renderer::Mesh sphere;
 stingray::renderer::Mesh cylinder;
 stingray::renderer::Mesh lightSphere;
@@ -71,7 +72,7 @@ unsigned int vertPosLoc = 0;
 unsigned int vertNormLoc = 1;
 unsigned int vertTexLoc = 2;
 
-stingray::renderer::Camera camera(glm::vec3(0.0f, 0.05f, 0.0f));
+stingray::renderer::Camera camera(glm::vec3(0.0f, -2.0f, 0.0f));
 
 float lastX = SCR_WIDTH / 2.0;
 float lastY = SCR_HEIGHT / 2.0;
@@ -427,7 +428,7 @@ int main(void) {
                      "%d");
     ImGui::End();
 
-    glm::vec3 lightPos(6.0f, 2.0f, 50.0f);
+    glm::vec3 lightPos(6.0f, 2.0f, 20.0f);
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 projection = glm::mat4(1.0f);
     projection =
@@ -444,6 +445,17 @@ int main(void) {
     // gridShader.setMat4("model", gridModel);
     // grid.Draw(gridShader);
     // glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    lightShader.use();
+
+    glm::mat4 model(1.0f);
+    model = glm::translate(model, lightPos);
+    model = glm::scale(model, glm::vec3(0.2f));
+
+    lightShader.setMat4("view", view);
+    lightShader.setMat4("projection", projection);
+    lightShader.setMat4("model", model);
+    lightSphere.Draw(lightShader);
 
     oceanShader.use();
     oceanShader.setMat4("view", view);
@@ -496,9 +508,9 @@ int main(void) {
       oceanShader.setVec2(p + "dir", d);
     }
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
-    ocean.Draw(oceanShader);
+    // glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
+    // ocean.Draw(oceanShader);
 
     shader.use();
     shader.setMat4("view", view);
@@ -517,29 +529,18 @@ int main(void) {
     // shader.setVec3("material.diffuseColor", glm::vec3(0.8f, 0.5f, 0.2f));
     // bag.Draw(shader);
 
-    // shader.setVec3("material.diffuseColor", glm::vec3(1.0f));
-    // renderScene(shader, fbWidth, fbHeight);
+    shader.setVec3("material.diffuseColor", glm::vec3(1.0f));
+    renderScene(shader, fbWidth, fbHeight);
 
-    lightShader.use();
-
-    glm::mat4 model(1.0f);
-    model = glm::translate(model, lightPos);
-    model = glm::scale(model, glm::vec3(0.2f));
-
-    lightShader.setMat4("view", view);
-    lightShader.setMat4("projection", projection);
-    lightShader.setMat4("model", model);
-    lightSphere.Draw(lightShader);
-
-    glDepthMask(GL_FALSE);
-    skyboxShader.use();
-    glm::mat4 skyboxView = glm::mat4(glm::mat3(camera.getViewMatrix()));
-    skyboxShader.setMat4("view", skyboxView);
-    skyboxShader.setMat4("projection", projection);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
-    skybox.Draw(skyboxShader);
-    glDepthMask(GL_TRUE);
+    // glDepthMask(GL_FALSE);
+    // skyboxShader.use();
+    // glm::mat4 skyboxView = glm::mat4(glm::mat3(camera.getViewMatrix()));
+    // skyboxShader.setMat4("view", skyboxView);
+    // skyboxShader.setMat4("projection", projection);
+    // glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
+    // skybox.Draw(skyboxShader);
+    // glDepthMask(GL_TRUE);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

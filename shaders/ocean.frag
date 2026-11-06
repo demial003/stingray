@@ -95,7 +95,7 @@ void main() {
 	vec3 normal = normalize(vec3(Normal.x - tiltSum.x, Normal.y, Normal.z - tiltSum.y));
 	vec3 viewDir = normalize(viewPos - FragPos);
 	Color res = CalcDirLight(dirLight, normal, viewDir);
-	vec3 result = mix(res.body, calcEnvironmentMap(), 0.3) + res.specular;
+	vec3 result = mix(res.body, calcEnvironmentMap(), 0.5) + res.specular;
 	FragColor = vec4(result, 1.0);
 
 }
