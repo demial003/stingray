@@ -187,6 +187,40 @@ void mouse_callback(GLFWwindow *window, double xPosIn, double yPosIn) {
 
   camera.processMouseMovement(xoffset, yoffset);
 }
+
+GLenum glCheckError_(const char *file, int line) {
+  GLenum errorCode;
+  while ((errorCode = glGetError()) != GL_NO_ERROR) {
+    std::string error;
+    switch (errorCode) {
+    case GL_INVALID_ENUM:
+      error = "INVALID_ENUM";
+      break;
+    case GL_INVALID_VALUE:
+      error = "INVALID_VALUE";
+      break;
+    case GL_INVALID_OPERATION:
+      error = "INVALID_OPERATION";
+      break;
+    case GL_STACK_OVERFLOW:
+      error = "STACK_OVERFLOW";
+      break;
+    case GL_STACK_UNDERFLOW:
+      error = "STACK_UNDERFLOW";
+      break;
+    case GL_OUT_OF_MEMORY:
+      error = "OUT_OF_MEMORY";
+      break;
+    case GL_INVALID_FRAMEBUFFER_OPERATION:
+      error = "INVALID_FRAMEBUFFER_OPERATION";
+      break;
+    }
+    std::cout << error << " | " << file << " (" << line << ")" << std::endl;
+  }
+  return errorCode;
+}
+#define glCheckError() glCheckError_(__FILE__, __LINE__)
+
 void processInput(GLFWwindow *window) {
   using namespace stingray::renderer;
 
@@ -248,7 +282,9 @@ unsigned int loadCubemap(std::vector<std::string> faces) {
 
   return textureID;
 }
+
 int main(void) {
+
   GLFWwindow *window;
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -276,6 +312,7 @@ int main(void) {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
   glEnable(GL_CULL_FACE);
+  glCheckError();
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -302,6 +339,7 @@ int main(void) {
   grid.genQuad(100, 100);
   ocean.genQuad(256, 256);
   skybox.genCube();
+  glCheckError();
 
   std::vector<std::string> faces{
       "../assets/qwantani-cubemap/px.png", "../assets/qwantani-cubemap/nx.png",
@@ -347,6 +385,7 @@ int main(void) {
                whitePixel);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glCheckError();
 
   float scale = 50.0;
   float shininess = 64.0f;
@@ -355,8 +394,8 @@ int main(void) {
   float baseAmplitude = 1.0;
   float steepness = 0.5;
   float windAngle = glm::radians(225.0);
-  float freqRatio = 1.0;
-  float ampRatio = 1.0;
+  float freqRatio = 1.18;
+  float ampRatio = 0.82;
 
   float textureWavelength = 4.0;
   float textureAmp = 0.1;
@@ -377,6 +416,7 @@ int main(void) {
     float lenRatio;
     float angleOffset;
   };
+
   WaveCpu waves[maxWaves];
   WaveCpu textureWaves[maxTextureWaves];
 

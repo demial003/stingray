@@ -49,7 +49,7 @@ vec2 ripple(Wave wave, vec3 bPos){
 	float c1 = wave.dir.x * wave.freq * wave.amp * k;
 	float c2 = wave.dir.y * wave.freq * wave.amp * k;
 	
-	float s = pow(exp(sin(u) - 1.0), k - 1.0);
+	float s = exp(sin(u) - 1);
 	float c = cos(u);
 	
 	float du = c1 * s * c;
