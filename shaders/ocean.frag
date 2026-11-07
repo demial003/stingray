@@ -1,7 +1,7 @@
 #version 400 core
 out vec4 FragColor;
 
-const int MAX_WAVES = 24;
+const int MAX_WAVES = 50;
 
 struct Material {
   vec3 diffuseColor;
@@ -49,7 +49,7 @@ vec2 ripple(Wave wave, vec3 bPos){
 	float c1 = wave.dir.x * wave.freq * wave.amp * k;
 	float c2 = wave.dir.y * wave.freq * wave.amp * k;
 	
-	float s = pow((sin(u) + 1.0) / 2.0, k - 1.0);
+	float s = pow(exp(sin(u) - 1.0), k - 1.0);
 	float c = cos(u);
 	
 	float du = c1 * s * c;
@@ -95,7 +95,9 @@ void main() {
 	vec3 normal = normalize(vec3(Normal.x - tiltSum.x, Normal.y, Normal.z - tiltSum.y));
 	vec3 viewDir = normalize(viewPos - FragPos);
 	Color res = CalcDirLight(dirLight, normal, viewDir);
-	vec3 result = mix(res.body, calcEnvironmentMap(), 0.5) + res.specular;
-	FragColor = vec4(result, 1.0);
+	 vec3 result = mix(res.body, calcEnvironmentMap(), 0.3) + res.specular;
+	// vec3 result = res.body + res.specular;
+	  FragColor = vec4(result, 1.0);
+	 // FragColor = vec4(normalize(Normal) * 0.5 + 0.5, 1.0);
 
 }
