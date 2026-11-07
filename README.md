@@ -5,4 +5,5 @@ A from scratch C++/OpenGL physics and graphics engine.
 ![pendulum](demos/pendulum.gif)
 
 ## ocean - wip
-![ocean](demos/oceanv0.1.png)
+![ocean](demos/oceanv0.2.png)
+
