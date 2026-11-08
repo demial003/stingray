@@ -1,3 +1,4 @@
+#include "imgui.h"
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
@@ -47,9 +48,13 @@ float cylHeight = 5.0f;
 stingray::renderer::Mesh sphere;
 stingray::renderer::Mesh cylinder;
 stingray::renderer::Mesh lightSphere;
+stingray::renderer::Mesh frameBufferTexture;
 stingray::renderer::Mesh grid;
 stingray::renderer::Mesh ocean;
 stingray::renderer::Mesh skybox;
+
+unsigned int fboAttachment;
+int fbWidth, fbHeight;
 
 stingray::physics::Vec3 GRAVITY(0.0, -9.81, 0.0);
 
@@ -72,7 +77,7 @@ unsigned int vertPosLoc = 0;
 unsigned int vertNormLoc = 1;
 unsigned int vertTexLoc = 2;
 
-stingray::renderer::Camera camera(glm::vec3(0.0f, 2.0f, 0.0f));
+stingray::renderer::Camera camera(glm::vec3(0.0f, 4.0f, 0.0f));
 
 float lastX = SCR_WIDTH / 2.0;
 float lastY = SCR_HEIGHT / 2.0;
@@ -221,6 +226,87 @@ GLenum glCheckError_(const char *file, int line) {
 }
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
 
+void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id,
+                            GLenum severity, GLsizei length,
+                            const char *message, const void *userParam) {
+
+  if (id == 131169 || id == 131185 || id == 131218 || id == 131204)
+    return;
+
+  std::cout << "---------------" << std::endl;
+  std::cout << "Debug message (" << id << "): " << message << std::endl;
+
+  switch (source) {
+  case GL_DEBUG_SOURCE_API:
+    std::cout << "Source: API";
+    break;
+  case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+    std::cout << "Source: Window System";
+    break;
+  case GL_DEBUG_SOURCE_SHADER_COMPILER:
+    std::cout << "Source: Shader Compiler";
+    break;
+  case GL_DEBUG_SOURCE_THIRD_PARTY:
+    std::cout << "Source: Third Party";
+    break;
+  case GL_DEBUG_SOURCE_APPLICATION:
+    std::cout << "Source: Application";
+    break;
+  case GL_DEBUG_SOURCE_OTHER:
+    std::cout << "Source: Other";
+    break;
+  }
+  std::cout << std::endl;
+
+  switch (type) {
+  case GL_DEBUG_TYPE_ERROR:
+    std::cout << "Type: Error";
+    break;
+  case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+    std::cout << "Type: Deprecated Behaviour";
+    break;
+  case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+    std::cout << "Type: Undefined Behaviour";
+    break;
+  case GL_DEBUG_TYPE_PORTABILITY:
+    std::cout << "Type: Portability";
+    break;
+  case GL_DEBUG_TYPE_PERFORMANCE:
+    std::cout << "Type: Performance";
+    break;
+  case GL_DEBUG_TYPE_MARKER:
+    std::cout << "Type: Marker";
+    break;
+  case GL_DEBUG_TYPE_PUSH_GROUP:
+    std::cout << "Type: Push Group";
+    break;
+  case GL_DEBUG_TYPE_POP_GROUP:
+    std::cout << "Type: Pop Group";
+    break;
+  case GL_DEBUG_TYPE_OTHER:
+    std::cout << "Type: Other";
+    break;
+  }
+  std::cout << std::endl;
+
+  switch (severity) {
+  case GL_DEBUG_SEVERITY_HIGH:
+    std::cout << "Severity: high";
+    break;
+  case GL_DEBUG_SEVERITY_MEDIUM:
+    std::cout << "Severity: medium";
+    break;
+  case GL_DEBUG_SEVERITY_LOW:
+    std::cout << "Severity: low";
+    break;
+  case GL_DEBUG_SEVERITY_NOTIFICATION:
+    std::cout << "Severity: notification";
+    break;
+  }
+  std::cout << std::endl;
+  std::cout << std::endl;
+}
+
 void processInput(GLFWwindow *window) {
   using namespace stingray::renderer;
 
@@ -288,8 +374,9 @@ int main(void) {
   GLFWwindow *window;
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
   window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "pendulum-sim", NULL, NULL);
   if (window == nullptr) {
@@ -305,14 +392,24 @@ int main(void) {
     return -1;
   }
 
-  int fbWidth, fbHeight;
+  int flags;
+  glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+  if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(glDebugOutput, nullptr);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
+                          GL_TRUE);
+  }
+
   glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
   glViewport(0, 0, fbWidth, fbHeight);
   glCullFace(GL_BACK);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
   glEnable(GL_CULL_FACE);
-  glCheckError();
+  glDisable(GL_CULL_FACE);
+  // glCheckError();
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -330,6 +427,8 @@ int main(void) {
                                          "../shaders/ocean.frag");
   stingray::renderer::Shader skyboxShader("../shaders/skybox.vert",
                                           "../shaders/skybox.frag");
+  stingray::renderer::Shader frameBufferShader("../shaders/framebuffer.vert",
+                                               "../shaders/framebuffer.frag");
 
   stingray::physics::ParticleWorld world(2, 4);
 
@@ -339,7 +438,7 @@ int main(void) {
   grid.genQuad(100, 100);
   ocean.genQuad(256, 256);
   skybox.genCube();
-  glCheckError();
+  // glCheckError();
 
   std::vector<std::string> faces{
       "../assets/qwantani-cubemap/px.png", "../assets/qwantani-cubemap/nx.png",
@@ -385,9 +484,10 @@ int main(void) {
                whitePixel);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glCheckError();
+  // glCheckError();
 
   float scale = 50.0;
+  float edgeLength = 2.0 * scale / (256.0 - 1.0);
   float shininess = 64.0f;
   float baseWavelength = 32.0;
   float speed = 1.0;
@@ -447,8 +547,10 @@ int main(void) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
+    ImGui::Text("%.1f FPS (%.2f ms)", io.Framerate, 1000.0f / io.Framerate);
+
     ImGui::Begin("geometry params");
-    ImGui::SliderFloat("shininess", &shininess, 0.0f, 128.0f, "%.2f");
+    ImGui::SliderFloat("scale", &scale, 0.0f, 1024.0f, "%.2f");
     ImGui::SliderFloat("wavelength", &baseWavelength, 1.0f, 100.0f, "%.2f");
     ImGui::SliderFloat("amplitude", &baseAmplitude, 0.0f, 10.0f, "%.2f");
     ImGui::SliderFloat("speed", &speed, 0.0f, 3.0f, "%.2f");
@@ -494,7 +596,7 @@ int main(void) {
     model = glm::translate(model, lightPos);
     model = glm::scale(model, glm::vec3(0.2f));
 
-    lightShader.setMat4("view", view);
+    lightShader.setMat4("view", glm::mat4(glm::mat3(camera.getViewMatrix())));
     lightShader.setMat4("projection", projection);
     lightShader.setMat4("model", model);
     lightSphere.Draw(lightShader);
@@ -516,11 +618,13 @@ int main(void) {
     oceanShader.setFloat("uTime", (float)glfwGetTime());
     oceanShader.setFloat("steepness", steepness);
     oceanShader.setVec3("viewPos", camera.position);
+    oceanShader.setFloat("edgeLength", edgeLength);
     oceanShader.setInt("numWaves", numWaves);
     oceanShader.setInt("maxWaves", maxWaves);
     oceanShader.setInt("numTextureWaves", numTextureWaves);
     oceanShader.setInt("maxTextureWaves", maxTextureWaves);
     oceanShader.setFloat("k", 1.0);
+    // glCheckError();
 
     float freq = 2.0 * M_PI / baseWavelength;
     float amp = baseAmplitude;
@@ -590,6 +694,7 @@ int main(void) {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);
+    glfwSwapInterval(0);
     // glfwWaitEventsTimeout(1.0 / 60.0);
     glfwPollEvents();
   }
