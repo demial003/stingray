@@ -373,8 +373,13 @@ int main(void) {
 
   GLFWwindow *window;
   glfwInit();
+#ifdef __APPLE__
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+#else
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+#endif
   glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
@@ -417,6 +422,18 @@ int main(void) {
   glfwSetCursorPosCallback(window, mouse_callback);
   glfwSetKeyCallback(window, key_callback);
 
+#if __APPLE__
+  stingray::renderer::Shader shader("../shaders-mac/shader.vert",
+                                    "../shaders-mac/shader.frag");
+  stingray::renderer::Shader lightShader("../shaders-mac/lightShader.vert",
+                                         "../shaders-mac/lightShader.frag");
+  stingray::renderer::Shader gridShader("../shaders-mac/grid.vert",
+                                        "../shaders-mac/grid.frag");
+  stingray::renderer::Shader oceanShader("../shaders-mac/ocean.vert",
+                                         "../shaders-mac/ocean.frag");
+  stingray::renderer::Shader skyboxShader("../shaders-mac/skybox.vert",
+                                          "../shaders-mac/skybox.frag");
+#else
   stingray::renderer::Shader shader("../shaders/shader.vert",
                                     "../shaders/shader.frag");
   stingray::renderer::Shader lightShader("../shaders/lightShader.vert",
@@ -427,8 +444,7 @@ int main(void) {
                                          "../shaders/ocean.frag");
   stingray::renderer::Shader skyboxShader("../shaders/skybox.vert",
                                           "../shaders/skybox.frag");
-  stingray::renderer::Shader frameBufferShader("../shaders/framebuffer.vert",
-                                               "../shaders/framebuffer.frag");
+#endif
 
   stingray::physics::ParticleWorld world(2, 4);
 
