@@ -13,13 +13,14 @@ out vec2 TexCoords;
 out vec3 debugColor;
 
 const float pi = 3.14159265359;
-const int MAX_WAVES = 32;
+const int MAX_WAVES = 64;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform float k;
 uniform float uTime;
+uniform float drag;
 uniform float edgeLength;
 
 struct Wave {
@@ -64,8 +65,9 @@ waveData eulerWave(Wave wave, vec3 bPos){
 	vec3 offset = vec3(x, y, z);
 	vec3 binormal = vec3(1 - q * wa2 * pow(wave.dir.x, 2) * s2, wa * wave.dir.x * s * c, -q * wa2 * wave.dir.x * wave.dir.y * s2);
 	vec3 tangent = vec3(- q * wa2 * wave.dir.y * wave.dir.x * s2, wa * wave.dir.y * s * c, 1 - q * wa2 * pow(wave.dir.y , 2) * s2);
+	vec2 shift = wave.dir * (wave.amp * s * c) * drag;
  
-	return waveData(offset, vec3(0), binormal, tangent);
+	return waveData(offset, vec3(shift, 0), binormal, tangent);
 }
 
 waveData geometricWave(Wave wave, vec3 bPos){
@@ -95,13 +97,15 @@ void main(){
 	FragPos = vec3(0);
 	Normal = vec3(0);
 
+	vec2 p = bPos.xz;
 	for(int i = 0; i < numWaves; i++){
-		waveData data = eulerWave(geometricWaves[i], bPos);
+		waveData data = eulerWave(geometricWaves[i], vec3(p.x, bPos.y, p.y));
 		data.tangent.z -= 1;
 		data.binormal.x -= 1;
 		posSum += data.offset;
 		tangentSum += data.tangent ;
 		binormalSum += data.binormal ;
+		p += data.tilt.xy;
 	 }
 
 	tangentSum.z += 1;

@@ -1,7 +1,7 @@
 #version 430 core
 out vec4 FragColor;
 
-const int MAX_WAVES = 32;
+const int MAX_WAVES = 64;
 const float pi = 3.14159265359;
 
 struct Material {
@@ -40,6 +40,7 @@ in vec3 debugColor;
 uniform DirLight dirLight;
 uniform float k;
 uniform float uTime;
+uniform float drag;
 uniform samplerCube skybox;
 uniform Material material;
 uniform vec3 viewPos;
@@ -47,9 +48,7 @@ uniform float steepness;
 uniform float edgeLength;
 uniform int numWaves;
 
-uniform Wave[MAX_WAVES] textureWaves;
 uniform Wave[MAX_WAVES] geometricWaves;
-uniform int numTextureWaves;
 
 struct waveData {
 	vec3 offset;
@@ -57,22 +56,6 @@ struct waveData {
 	vec3 binormal;
 	vec3 tangent;
 };
-
-vec2 ripple(Wave wave, vec3 bPos){
-	float u = dot(wave.dir, bPos.xz ) * wave.freq + uTime * wave.phaseOffset;
-
-	float c1 = wave.dir.x * wave.freq * wave.amp * k;
-	float c2 = wave.dir.y * wave.freq * wave.amp * k;
-	
-	float s = exp(sin(u) - 1);
-	float c = cos(u);
-	
-	float du = c1 * s * c;
-	float dv = c2 * s * c;
-
-	return vec2(du, dv);
-
-}
 
 waveData eulerWave(Wave wave, vec3 bPos){
  	float s = exp(sin(dot(wave.dir, bPos.xz) * wave.freq + uTime * wave.phaseOffset) - 1.0);
@@ -90,22 +73,28 @@ waveData eulerWave(Wave wave, vec3 bPos){
  	float x = q * wave.dir.x * c * weight;
  	float y = wave.amp * s;
  	float z = q * wave.dir.y * c * weight;
-
-	float wa = wave.freq * wave.amp;
+float wa = wave.freq * wave.amp;
 	float wa2 = wave.freq * weight;
 	vec3 offset = vec3(x, y, z);
 	vec3 binormal = vec3(1 - q * wa2 * pow(wave.dir.x, 2) * s2, wa * wave.dir.x * s * c, -q * wa2 * wave.dir.x * wave.dir.y * s2);
 	vec3 tangent = vec3(- q * wa2 * wave.dir.y * wave.dir.x * s2, wa * wave.dir.y * s * c, 1 - q * wa2 * pow(wave.dir.y , 2) * s2);
  
-	return waveData(offset, vec3(0), binormal, tangent);
+	vec2 shift = wave.dir *(wave.amp * s * c) * drag;
+ 
+	return waveData(offset, vec3(shift, 0), binormal, tangent);
 }
 
-vec3 calcEnvironmentMap(vec3 normal){
-	float ratio = 1.00 / 1.33;
-	vec3 I = normalize(FragPos - viewPos);
-    vec3 R = reflect(I, normalize(normal));
-    // vec3 R = refract(I, normalize(Normal), ratio);
+vec3 calcEnvironmentMap(vec3 normal, vec3 R){
     return vec3(texture(skybox, R).rgb);
+}
+
+float calcFresnel(vec3 normal, vec3 viewDir){
+	float n1 = 1.0;
+	float n2 = 1.33;
+	float F0 = pow((n1 - n2) / (n1 + n2), 2.0);
+	float base = 1 - max(dot(viewDir, normal), 0.0);
+	float exponential = pow(base, 5.0);
+	return exponential + F0 * (1.0 - exponential);
 }
 
 Color CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
@@ -129,29 +118,40 @@ Color CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
 }
 
 void main() {
+
 	vec2 tiltSum = vec2(0);
 	vec3 normal = vec3(0);
 	vec3 binormalSum = vec3(0);
 	vec3 tangentSum = vec3(0);
 	
-	for(int i = 0; i <  numTextureWaves; i++){
-		tiltSum += ripple(textureWaves[i], VertPos);
-	}
+	vec2 p = VertPos.xz;
 	for(int i = 0; i < numWaves; i++){
-		waveData data = eulerWave(geometricWaves[i], VertPos);
+		waveData data = eulerWave(geometricWaves[i], vec3(p.x, VertPos.y, p.y));
 		data.tangent.z -= 1;
 		data.binormal.x -= 1;
-		tangentSum += data.tangent ;
-		binormalSum += data.binormal ;
+		tangentSum += data.tangent;
+		binormalSum += data.binormal;
+		p += data.tilt.xy;
 	}
 	tangentSum.z += 1;
 	binormalSum.x += 1;
-	 normal = normalize(cross(tangentSum, binormalSum));
-	 // normal = normalize(vec3(Normal.x - tiltSum.x, Normal.y, Normal.z - tiltSum.y));
+	normal = normalize(cross(tangentSum, binormalSum));
+	float ratio = 1.00 / 1.33;
+	vec3 I = normalize(FragPos - viewPos);
+    vec3 R = reflect(I, normalize(normal));
+	vec3 envMap = calcEnvironmentMap(normal, R);
+
 	vec3 viewDir = normalize(viewPos - FragPos);
+
+	float fresnel = calcFresnel(normal, viewDir);
+
+	float fade = smoothstep(-0.3, 0.0, R.y);
+
 	Color res = CalcDirLight(dirLight, normal, viewDir);
-	vec3 result = mix(res.body, calcEnvironmentMap(normal), 0.3) + res.specular;
+	vec3 result = mix(res.body, envMap, fresnel * fade);
+	// vec3 result = res.body + res.specular;
+
 	FragColor = vec4(result, 1.0);
-	// FragColor.rgb = normal * 0.5 + 0.5;
+	// FragColor.rgb = vec3(normal);
 
 }
