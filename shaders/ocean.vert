@@ -4,13 +4,15 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
 
-out vec3 Normal;
-out vec3 Binormal;
-out vec3 Tangent;
-out vec3 VertPos;
-out vec3 FragPos;
-out vec2 TexCoords;
-out vec3 debugColor;
+out VS_OUT {
+	vec3 Normal;
+	vec3 Binormal;
+	vec3 Tangent;
+	vec3 VertPos;
+	vec3 FragPos;
+	vec2 TexCoords;
+	vec3 debugColor;
+} vs_out;
 
 const float pi = 3.14159265359;
 const int MAX_WAVES = 64;
@@ -63,8 +65,8 @@ waveData eulerWave(Wave wave, vec3 bPos){
 	float wa = wave.freq * wave.amp;
 	float wa2 = wave.freq * weight;
 	vec3 offset = vec3(x, y, z);
-	vec3 binormal = vec3(1 - q * wa2 * pow(wave.dir.x, 2) * s2, wa * wave.dir.x * s * c, -q * wa2 * wave.dir.x * wave.dir.y * s2);
-	vec3 tangent = vec3(- q * wa2 * wave.dir.y * wave.dir.x * s2, wa * wave.dir.y * s * c, 1 - q * wa2 * pow(wave.dir.y , 2) * s2);
+	vec3 binormal = vec3( - q * wa2 * pow(wave.dir.x, 2) * s2, wa * wave.dir.x * s * c, -q * wa2 * wave.dir.x * wave.dir.y * s2);
+	vec3 tangent = vec3(- q * wa2 * wave.dir.y * wave.dir.x * s2, wa * wave.dir.y * s * c,  - q * wa2 * pow(wave.dir.y , 2) * s2);
 	vec2 shift = wave.dir * (wave.amp * s * c) * drag;
  
 	return waveData(offset, vec3(shift, 0), binormal, tangent);
@@ -94,14 +96,12 @@ void main(){
 	vec3 binormalSum = vec3(0);
 	vec3 tangentSum = vec3(0);
 
-	FragPos = vec3(0);
-	Normal = vec3(0);
+	vs_out.FragPos = vec3(0);
+	vs_out.Normal = vec3(0);
 
 	vec2 p = bPos.xz;
 	for(int i = 0; i < numWaves; i++){
 		waveData data = eulerWave(geometricWaves[i], vec3(p.x, bPos.y, p.y));
-		data.tangent.z -= 1;
-		data.binormal.x -= 1;
 		posSum += data.offset;
 		tangentSum += data.tangent ;
 		binormalSum += data.binormal ;
@@ -112,11 +112,11 @@ void main(){
 	binormalSum.x += 1;
 	vec3 normal = normalize(cross(tangentSum, binormalSum));
 	
-	VertPos = bPos;
-	FragPos = bPos + posSum;
-	Normal = normal;
-	Binormal = normalize(binormalSum);
-	Tangent = normalize(tangentSum);
-	TexCoords = aTexCoord;
-	gl_Position = projection * view * vec4(FragPos, 1.0);
+	vs_out.VertPos = bPos;
+	vs_out.FragPos = bPos + posSum;
+	vs_out.Normal = normal;
+	vs_out.Binormal = normalize(binormalSum);
+	vs_out.Tangent = normalize(tangentSum);
+	vs_out.TexCoords = aTexCoord;
+	gl_Position = projection * view * vec4(vs_out.FragPos, 1.0);
 }

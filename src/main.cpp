@@ -48,7 +48,6 @@ float cylHeight = 5.0f;
 stingray::renderer::Mesh sphere;
 stingray::renderer::Mesh cylinder;
 stingray::renderer::Mesh lightSphere;
-stingray::renderer::Mesh frameBufferTexture;
 stingray::renderer::Mesh grid;
 stingray::renderer::Mesh ocean;
 stingray::renderer::Mesh skybox;
@@ -77,7 +76,7 @@ unsigned int vertPosLoc = 0;
 unsigned int vertNormLoc = 1;
 unsigned int vertTexLoc = 2;
 
-stingray::renderer::Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
+stingray::renderer::Camera camera(glm::vec3(0.0f, 2.0f, 0.0f));
 
 float lastX = SCR_WIDTH / 2.0;
 float lastY = SCR_HEIGHT / 2.0;
@@ -506,7 +505,7 @@ int main(void) {
   // glCheckError();
 
   float scale = 100.0;
-  float shininess = 64.0f;
+  float shininess = 72.0f;
   float baseWavelength = 32.0;
   float speed = 1.0;
   float baseAmplitude = 0.89;
@@ -515,22 +514,17 @@ int main(void) {
   float freqRatio = 1.175;
   float ampRatio = 0.83;
 
-  float textureWavelength = 4.0;
-  float textureAmp = 0.1;
-  float textureSpeed = 1.0;
-  float textureFreq = 0;
-  float textureWindAngle = glm::radians(225.0);
-
   glm::vec3 lightPos(78.0f, 15.0f, 64.0f);
+  glm::vec3 lightAmbient(0.35f);
+  glm::vec3 lightDiffuse(0.5f);
+  glm::vec3 lightSpecular(1.0f, 0.859f, 0.584f);
 
-  int numWaves = 0;
-  const int maxWaves = 64;
-  int numTextureWaves = 0;
-  const int maxTextureWaves = 50;
+  int numWaves = 16;
+  const int maxWaves = 32;
 
-  std::mt19937 rng(12345);
+  std::mt19937 rng(34524);
   std::uniform_real_distribution<float> logDist(std::log(0.5), std::log(2.0f));
-  std::uniform_real_distribution<float> angleDist(0.0f, 3.14159f);
+  std::uniform_real_distribution<float> angleDist(0.0f, 0.75f * 3.14159f);
 
   struct WaveCpu {
     float lenRatio;
@@ -562,7 +556,6 @@ int main(void) {
     ImGui::NewFrame();
 
     ImGui::Text("%.1f FPS (%.2f ms)", io.Framerate, 1000.0f / io.Framerate);
-    ImGui::SliderFloat("shininess", &shininess, 1.0f, 100.0f, "%.2f");
 
     ImGui::Begin("geometry params");
     ImGui::SliderFloat("scale", &scale, 1.0f, 500.0f, "%.2f");
@@ -578,6 +571,12 @@ int main(void) {
     ImGui::End();
 
     ImGui::Begin("lighting");
+    ImGui::ColorEdit3("ambient", glm::value_ptr(lightAmbient),
+                      ImGuiColorEditFlags_Float);
+    ImGui::ColorEdit3("diffuse", glm::value_ptr(lightDiffuse),
+                      ImGuiColorEditFlags_Float);
+    ImGui::ColorEdit3("specular", glm::value_ptr(lightSpecular),
+                      ImGuiColorEditFlags_Float);
     ImGui::End();
 
     glm::mat4 view = camera.getViewMatrix();
@@ -620,9 +619,9 @@ int main(void) {
                         glm::vec3(0.32f, 0.52f, 0.72f));
     oceanShader.setFloat("material.shininess", shininess);
     oceanShader.setVec3("dirLight.direction", -lightPos);
-    oceanShader.setVec3("dirLight.ambient", 0.35f, 0.35f, 0.35f);
-    oceanShader.setVec3("dirLight.diffuse", 0.5f, 0.5f, 0.5f);
-    oceanShader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
+    oceanShader.setVec3("dirLight.ambient", lightAmbient);
+    oceanShader.setVec3("dirLight.diffuse", lightDiffuse);
+    oceanShader.setVec3("dirLight.specular", lightSpecular);
     oceanShader.setFloat("uTime", (float)glfwGetTime());
     oceanShader.setFloat("steepness", steepness);
     oceanShader.setVec3("viewPos", camera.position);
@@ -630,8 +629,6 @@ int main(void) {
     oceanShader.setInt("numWaves", numWaves);
     oceanShader.setFloat("drag", 0.3f);
     oceanShader.setInt("maxWaves", maxWaves);
-    oceanShader.setInt("numTextureWaves", numTextureWaves);
-    oceanShader.setInt("maxTextureWaves", maxTextureWaves);
     oceanShader.setFloat("k", 1.0);
     // glCheckError();
 

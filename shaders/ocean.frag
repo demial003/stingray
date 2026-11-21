@@ -28,13 +28,15 @@ struct DirLight {
   vec3 specular;
 };
 
-in vec3 VertPos;
-in vec3 FragPos;
-in vec3 Binormal;
-in vec3 Tangent;
-in vec3 Normal;
-in vec2 TexCoords;
-in vec3 debugColor;
+in VS_OUT {
+	vec3 Normal;
+	vec3 Binormal;
+	vec3 Tangent;
+	vec3 VertPos;
+	vec3 FragPos;
+	vec2 TexCoords;
+	vec3 debugColor;
+} fs_in;
 
 
 uniform DirLight dirLight;
@@ -76,8 +78,8 @@ waveData eulerWave(Wave wave, vec3 bPos){
 float wa = wave.freq * wave.amp;
 	float wa2 = wave.freq * weight;
 	vec3 offset = vec3(x, y, z);
-	vec3 binormal = vec3(1 - q * wa2 * pow(wave.dir.x, 2) * s2, wa * wave.dir.x * s * c, -q * wa2 * wave.dir.x * wave.dir.y * s2);
-	vec3 tangent = vec3(- q * wa2 * wave.dir.y * wave.dir.x * s2, wa * wave.dir.y * s * c, 1 - q * wa2 * pow(wave.dir.y , 2) * s2);
+	vec3 binormal = vec3( -q * wa2 * pow(wave.dir.x, 2) * s2, wa * wave.dir.x * s * c, -q * wa2 * wave.dir.x * wave.dir.y * s2);
+	vec3 tangent = vec3(- q * wa2 * wave.dir.y * wave.dir.x * s2, wa * wave.dir.y * s * c,  -q * wa2 * pow(wave.dir.y , 2) * s2);
  
 	vec2 shift = wave.dir *(wave.amp * s * c) * drag;
  
@@ -124,11 +126,9 @@ void main() {
 	vec3 binormalSum = vec3(0);
 	vec3 tangentSum = vec3(0);
 	
-	vec2 p = VertPos.xz;
+	vec2 p = fs_in.VertPos.xz;
 	for(int i = 0; i < numWaves; i++){
-		waveData data = eulerWave(geometricWaves[i], vec3(p.x, VertPos.y, p.y));
-		data.tangent.z -= 1;
-		data.binormal.x -= 1;
+		waveData data = eulerWave(geometricWaves[i], vec3(p.x, fs_in.VertPos.y, p.y));
 		tangentSum += data.tangent;
 		binormalSum += data.binormal;
 		p += data.tilt.xy;
@@ -137,18 +137,18 @@ void main() {
 	binormalSum.x += 1;
 	normal = normalize(cross(tangentSum, binormalSum));
 	float ratio = 1.00 / 1.33;
-	vec3 I = normalize(FragPos - viewPos);
+	vec3 I = normalize(fs_in.FragPos - viewPos);
     vec3 R = reflect(I, normalize(normal));
 	vec3 envMap = calcEnvironmentMap(normal, R);
 
-	vec3 viewDir = normalize(viewPos - FragPos);
+	vec3 viewDir = normalize(viewPos - fs_in.FragPos);
 
 	float fresnel = calcFresnel(normal, viewDir);
 
 	float fade = smoothstep(-0.3, 0.0, R.y);
 
 	Color res = CalcDirLight(dirLight, normal, viewDir);
-	vec3 result = mix(res.body, envMap, fresnel * fade);
+	vec3 result = mix(res.body, envMap, fresnel * fade) + res.specular;
 	// vec3 result = res.body + res.specular;
 
 	FragColor = vec4(result, 1.0);
